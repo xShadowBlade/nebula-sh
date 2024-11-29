@@ -16,7 +16,6 @@ export type FlagTypes = boolean | string | number;
  *     defaultValue: false, // The flag default value. Also determines the flag type.
  * };
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface CommandFlag<TPrimaryFlagName extends string = string, TFlagType extends FlagTypes = FlagTypes> {
     /**
      * Any names aliases for the flag, as a string array.
