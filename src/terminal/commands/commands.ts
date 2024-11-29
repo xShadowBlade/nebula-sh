@@ -5,18 +5,26 @@
 /**
  * The possible flag types.
  */
-type FlagTypes = boolean | string | number;
+export type FlagTypes = boolean | string | number;
 
 /**
  * The command flag initializer.
+ * @example
+ * const helpFlag: CommandFlag<"help", boolean> = {
+ *     names: ["help", "h", "?"], // "help" is the primary name, "h" is the 1st alias, and "?" is the 2nd alias
+ *     description: "Display the help message", // The flag description
+ *     defaultValue: false, // The flag default value. Also determines the flag type.
+ * };
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-interface CommandFlag<TPrimaryFlagName extends string = any, TFlagType extends FlagTypes = any> {
+export interface CommandFlag<TPrimaryFlagName extends string = string, TFlagType extends FlagTypes = FlagTypes> {
     /**
      * Any names aliases for the flag, as a string array.
      * - The first index is the primary name.
-     * - The rest are aliases, with the 2nd index having the highest priority, etc.
-     * @example ["help", "h", "?"] // "help" is the primary name, "h" is the 1st alias, and "?" is the 2nd alias (h has higher priority than ?)
+     * - The rest are aliases.
+     * Note: If there are multiple flags, the last flag takes precedence.
+     * Ex: ls --my-flag=1 --my-flag=2 // my-flag will be 2
+     * @example ["help", "h", "?"] // "help" is the primary name, "h" is the 1st alias, and "?" is the 2nd alias
      */
     names: TPrimaryFlagName | [TPrimaryFlagName, ...string[]];
 
@@ -45,7 +53,7 @@ interface CommandFlag<TPrimaryFlagName extends string = any, TFlagType extends F
  * ];
  * type MyFlagKeys = GetFlagKeys<MyFlags>; // { help: boolean, version: string }
  */
-type GetFlagRecord<TFlags extends CommandFlag[]> = ObjectFromEntries<{
+export type GetFlagRecord<TFlags extends CommandFlag[]> = ObjectFromEntries<{
     // Convert the flag to a tuple of [name, type].
     [K in keyof TFlags]: TFlags[K] extends CommandFlag<infer TPrimaryFlagName, infer TFlagType>
         ? [TPrimaryFlagName, TFlagType]
@@ -57,7 +65,7 @@ type GetFlagRecord<TFlags extends CommandFlag[]> = ObjectFromEntries<{
  * @example
  * type Test = ObjectFromEntries<[["a", 1], ["b", 2]]>; // { a: 1, b: 2 }
  */
-type ObjectFromEntries<T extends [string, unknown][]> = {
+export type ObjectFromEntries<T extends [string, unknown][]> = {
     // Set `K` to each key entry in `T` by iterating over `T[number][0]`, which is a union of all keys in `T`.
     [K in T[number][0]]: Extract<T[number], [K, unknown]>[1]; // Get the value type of the key `K` in `T`.
 };
@@ -70,7 +78,7 @@ type ObjectFromEntries<T extends [string, unknown][]> = {
  * The options for the command constructor.
  * See {@link Command}.
  */
-interface CommandConstructorOptions<TFlags extends CommandFlag[]> {
+export interface CommandConstructorOptions<TFlags extends CommandFlag[]> {
     name: string;
     description: string;
     flags: TFlags;
@@ -80,7 +88,7 @@ interface CommandConstructorOptions<TFlags extends CommandFlag[]> {
 /**
  * A command.
  */
-class Command<TFlags extends CommandFlag[] = []> {
+export class Command<TFlags extends CommandFlag[] = CommandFlag[]> {
     /**
      * The command name.
      * @example "ls"
@@ -111,6 +119,19 @@ class Command<TFlags extends CommandFlag[] = []> {
     public onCommand: (args: string[], flags: GetFlagRecord<TFlags>) => void;
 
     /**
+     * Gets the default flags.
+     * @returns The default flags.
+     */
+    public getDefaultFlags(): GetFlagRecord<TFlags> {
+        return Object.fromEntries(
+            this.flags.map(({ names, defaultValue }) => {
+                const primaryName = Array.isArray(names) ? names[0] : names;
+                return [primaryName, defaultValue];
+            }),
+        ) as GetFlagRecord<TFlags>;
+    }
+
+    /**
      * Constructs a new command.
      * @param options - The command options.
      */
@@ -123,23 +144,3 @@ class Command<TFlags extends CommandFlag[] = []> {
         this.onCommand = onCommand;
     }
 }
-
-// Test
-new Command({
-    name: "ls",
-    description: "List directory contents",
-    flags: [
-        {
-            names: ["all", "a"],
-            description: "List all entries including those starting with a dot",
-            defaultValue: false,
-        } as CommandFlag<"all", boolean>,
-    ] satisfies CommandFlag[],
-    onCommand: (args, flags): void => {
-        console.log("args", args);
-        console.log("flags", flags);
-
-        // Intellisense test
-        // flags
-    },
-});
