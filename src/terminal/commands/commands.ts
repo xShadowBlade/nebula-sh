@@ -109,7 +109,7 @@ export type OnCommand<TFlags extends CommandFlag[] = CommandFlag[]> = (options: 
     privilege: Privileges;
 
     // TODO: Add support for async functions
-// TODO: Add support for return values
+    // TODO: Add support for return values
 }) => void;
 
 /**

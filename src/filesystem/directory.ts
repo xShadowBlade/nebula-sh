@@ -82,7 +82,7 @@ export class Directory {
 
         // If the path is absolute, throw an error
         if (pathParts[0] !== ".") {
-            throw new Error(`Path "${pathOrParts}" must be relative`);
+            throw new Error(`Path "${pathOrParts as string}" must be relative`);
         }
 
         /**

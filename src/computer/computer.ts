@@ -70,8 +70,8 @@ const lsCommand = new Command({
 
     onCommand: (options): void => {
         const { args, flags, currentWorkingDirectory } = options;
-        // log("args:", LogLevel.Info, args);
-        // log("flags:", LogLevel.Info, flags);
+        log("args:", LogLevel.Info, args);
+        log("flags:", LogLevel.Info, flags);
 
         // Get the directory
         const directory = args[0] ? currentWorkingDirectory.getDirectory(args[0]) : currentWorkingDirectory;
@@ -101,7 +101,7 @@ const adminOnlyCommand = new Command({
     flags: [] as CommandFlag[],
 
     onCommand: (options): void => {
-        log("Admin command run", LogLevel.Log);
+        log("Admin command run with privilege:", LogLevel.Log, options.privilege);
     },
     privilege: Privileges.Admin,
 });

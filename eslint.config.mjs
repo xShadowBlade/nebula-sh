@@ -38,7 +38,13 @@ export default tseslint.config(
             "@typescript-eslint/restrict-template-expressions": ["warn", { allowNumber: true, allowBoolean: true }],
             "@typescript-eslint/consistent-type-exports": "warn",
             "@typescript-eslint/consistent-type-imports": "warn",
-            "@typescript-eslint/naming-convention": "warn",
+            "@typescript-eslint/naming-convention": [
+                "warn",
+                {
+                    selector: "enumMember",
+                    format: ["PascalCase"],
+                },
+            ],
 
             "jsdoc/require-file-overview": 1,
         },

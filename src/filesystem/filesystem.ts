@@ -2,7 +2,7 @@
  * @file Declares the filesystem class.
  */
 import { Directory } from "./directory";
-import { File } from "./file";
+import type { File } from "./file";
 import { log, LogLevel } from "../terminal/utils/log";
 
 /**
@@ -92,7 +92,7 @@ export class Filesystem {
 
         // If the first part is not "/", log an error
         if (parts[0] !== "/") {
-            log(`Path "${pathOrParts}" must be absolute`, LogLevel.Error);
+            log(`Path "${pathOrParts as string}" must be absolute`, LogLevel.Error);
             return;
         }
 
