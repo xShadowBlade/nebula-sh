@@ -56,6 +56,9 @@ export class ConsoleHost {
         // TODO: Switch to xterm.js
         log(this.currentWorkingDirectory.path || "/", LogLevel.Shell, command);
 
+        // If the command is empty, return
+        if (command === "") return;
+
         this.commandDriver.runCommandString(command, this, options);
     }
 }

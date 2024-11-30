@@ -136,6 +136,11 @@ export class Directory {
         return currentDirectory;
     }
 
+    /**
+     * Gets the parent directory of a path.
+     * @param pathOrParts - The path or path parts.
+     * @returns The parent directory, if found.
+     */
     public getParentDirectoryOfPath(pathOrParts: string | string[]): Directory | undefined {
         const pathParts = typeof pathOrParts === "string" ? Filesystem.getPathParts(pathOrParts) : pathOrParts;
 

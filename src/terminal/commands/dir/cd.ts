@@ -41,7 +41,7 @@ export const cdCommand = new Command({
         // options.currentWorkingDirectory = directory;
         options.consoleHost.currentWorkingDirectory = directory;
 
-        log(`Changed to directory "${path}"`, LogLevel.Log);
+        // log(`Changed to directory "${path}"`, LogLevel.Log);
     },
 });
 
@@ -56,6 +56,6 @@ export const pwdCommand = new Command({
 
     // The function to run when the command is called
     onCommand: (options): void => {
-        log(options.currentWorkingDirectory.path, LogLevel.Log);
+        log(options.currentWorkingDirectory.path || "/", LogLevel.Log);
     },
 });

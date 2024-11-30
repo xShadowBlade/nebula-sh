@@ -48,21 +48,38 @@ const computer = new Computer();
     computer.commandDriver.addCommand(command);
 });
 
-// ["file.txt", "/folder/file.txt", "folder/file.txt", "../folder/file.txt", "../../folder/file.txt", "/", "."].forEach(
-//     (path) => {
-//         log(`path parts of "${path}":`, LogLevel.Info, Filesystem.getPathParts(path));
-//     },
-// );
+// [
+//     "file.txt",
+//     "/folder/file.txt",
+//     "folder/file.txt",
+//     "./folder/file.txt",
+//     "../folder/file.txt",
+//     "../../folder/file.txt",
+//     "/",
+//     ".",
+// ].forEach((path) => {
+//     log(`path parts of "${path}":`, LogLevel.Info, Filesystem.getPathParts(path));
+// });
 
+// Run some commands
 [
-    "mkdir /folder",
-    "touch /folder/file.txt",
-    "mkdir /folder/subfolder",
-    "touch /folder/subfolder/file2.txt",
-    "ls / -r",
-    "cd /folder",
+    "mkdir folder",
+    // "touch /folder/file.txt",
+    // "mkdir /folder/subfolder",
+    // "touch /folder/subfolder/file2.txt",
+    "cd ./folder",
     "pwd",
-    "ls",
+    "touch file.txt",
+    "mkdir subfolder",
+    "cd ./subfolder",
+    "pwd",
+    "touch file2.txt",
+    "cd ../..",
+    "pwd",
+
+    "ls -r",
+    "cd /folder",
+    "ls -r",
 ].forEach((command) => {
     computer.consoleHost.runCommand(command);
 });

@@ -35,8 +35,10 @@ export class Filesystem {
             parts.unshift(".");
         }
 
-        // Parse ".." and "."
-        // if (parts.length === 1) return parts as ["." | "/"];
+        // If the first part is "./", remove it
+        if (parts[1] === ".") {
+            parts.splice(1, 1);
+        }
 
         // If the first ".." is found, make it ".", "."
         if (parts[1] === "..") {

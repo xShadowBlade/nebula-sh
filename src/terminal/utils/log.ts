@@ -114,7 +114,9 @@ export function log(message: unknown, level: LogLevel = LogLevel.Log, ...optiona
             formatString = `\x1b[41m[ERROR]${ConsoleColors.reset} ` + `\x1b[31m%s${ConsoleColors.reset}`;
             break;
         case LogLevel.Shell:
-            formatString = `${ConsoleColors.fg.blue}%s${ConsoleColors.reset}$ ` + `${ConsoleColors.fg.green}%s${ConsoleColors.reset}`;
+            formatString =
+                `${ConsoleColors.fg.magenta}${ConsoleColors.dim}nebula-sh${ConsoleColors.reset} ${ConsoleColors.fg.blue}%s${ConsoleColors.reset}$ ` +
+                `${ConsoleColors.fg.green}%s${ConsoleColors.reset}`;
             break;
         case LogLevel.Log:
         default:
