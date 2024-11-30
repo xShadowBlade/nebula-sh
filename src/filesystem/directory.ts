@@ -2,6 +2,7 @@
  * @file Declares the directory class.
  */
 import { Filesystem } from "./filesystem";
+import { File } from "./file";
 
 /**
  * The possible contents of a directory.
@@ -11,7 +12,7 @@ export type DirectoryContent = Directory | File;
 /**
  * The options for the directory constructor.
  */
-interface DirectoryOptions {
+export interface DirectoryOptions {
     name: string;
     parent?: Directory | null;
     isRoot?: boolean;
