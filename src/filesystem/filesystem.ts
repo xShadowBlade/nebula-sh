@@ -81,7 +81,6 @@ export class Filesystem {
         }
 
         // Add the new file to the parent directory
-        // @ts-expect-error - Weird error (parameter is of type `File`, expected `DirectoryContent` (which is `Directory | File`))
         parentDirectory.addContent(fileToAdd);
     }
 

@@ -47,17 +47,6 @@ export class CommandDriver {
     private commands: Command[] = [];
 
     /**
-     * The computer instance.
-     * @deprecated Use {@link consoleHostReference} instead.
-     */
-    // private computerReference: Computer;
-
-    /**
-     * The console host reference.
-     */
-    // private consoleHostReference: ConsoleHost;
-
-    /**
      * Constructs a new command driver.
      * @param computer - The computer instance.
      * @param consoleHost - The console host.

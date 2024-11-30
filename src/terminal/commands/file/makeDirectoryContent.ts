@@ -1,11 +1,55 @@
 /**
  * @file Declares the mkdir and touch commands.
  */
+import type { CommandArgument, OnCommand } from "../commands";
 import { Command } from "../commands";
 import { Directory } from "../../../filesystem/directory";
 import { File } from "../../../filesystem/file";
 
 import { log, LogLevel } from "../../utils/log";
+import { Filesystem } from "../../../filesystem/filesystem";
+
+const mkdirAndTouchOnCommandFactory: (type: "file" | "directory") => OnCommand<[CommandArgument<string>]> = (type) => {
+    return (options): void => {
+        const { args } = options;
+
+        const path = args[0];
+
+        // Get the path parts
+        const pathParts = Filesystem.getPathParts(path);
+        const parentPath = pathParts.slice(0, -1);
+        const directoryOrFileName = pathParts[pathParts.length - 1];
+
+        // Get the parent directory
+        const parent = options.currentWorkingDirectory.getDirectory(pathParts.slice(0, -1));
+
+        // Debug: log the parent directory
+        log("parent:", LogLevel.Debug, {
+            parent: parent?.name,
+            pathParts,
+            parentPath,
+            // parentPathString: parent?.path,
+        });
+
+        // If the parent directory is not found, log an error
+        // TODO: make automatic directory creation
+        if (!parent) {
+            log(`Directory "${pathParts.slice(0, -1).join("/")}" not found`, LogLevel.Error);
+            return;
+        }
+
+        // const newDirectory = new Directory({ name: directoryName, parent: options.currentWorkingDirectory });
+
+        const newContent =
+            type === "file"
+                ? new File({ name: directoryOrFileName, content: "" })
+                : new Directory({ name: directoryOrFileName, parent: options.currentWorkingDirectory });
+
+        parent.addContent(newContent);
+
+        log(`Created ${type} "${path}"`, LogLevel.Log);
+    };
+};
 
 export const mkdirCommand = new Command({
     name: "mkdir",
@@ -18,24 +62,14 @@ export const mkdirCommand = new Command({
             description: "The path to the directory to create",
             defaultValue: "",
             required: true,
-        },
+        } as CommandArgument<string>,
     ],
 
     // The flags for the command
     flags: [],
 
     // The function to run when the command is called
-    onCommand: (options): void => {
-        const { args } = options;
-
-        const path = args[0];
-
-        const directory = new Directory({ name: path, parent: options.currentWorkingDirectory });
-
-        options.currentWorkingDirectory.contents.push(directory);
-
-        log(`Created directory "${path}"`, LogLevel.Log);
-    },
+    onCommand: mkdirAndTouchOnCommandFactory("directory"),
 });
 
 export const touchCommand = new Command({
@@ -45,8 +79,8 @@ export const touchCommand = new Command({
     // The arguments for the command
     arguments: [
         {
-            names: "name",
-            description: "The name of the file to create",
+            names: "path",
+            description: "The path of the file to create",
             defaultValue: "",
             required: true,
         },
@@ -56,15 +90,5 @@ export const touchCommand = new Command({
     flags: [],
 
     // The function to run when the command is called
-    onCommand: (options): void => {
-        const { args } = options;
-
-        const name = args[0];
-
-        const file = new File({ name: name, content: "" });
-
-        options.currentWorkingDirectory.addContent(file);
-
-        log(`Created file "${name}"`, LogLevel.Log);
-    },
+    onCommand: mkdirAndTouchOnCommandFactory("file"),
 });

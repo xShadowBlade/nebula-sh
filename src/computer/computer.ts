@@ -13,6 +13,7 @@ import { Privileges } from "./privileges";
 import { ConsoleHost } from "../terminal/consoleHost";
 
 import { lsCommand } from "../terminal/commands/file/ls";
+import { mkdirCommand, touchCommand } from "../terminal/commands/file/makeDirectoryContent";
 
 /**
  * The computer class.
@@ -43,6 +44,8 @@ const computer = new Computer();
 
 // Add the built-in commands
 computer.commandDriver.addCommand(lsCommand);
+computer.commandDriver.addCommand(mkdirCommand);
+computer.commandDriver.addCommand(touchCommand);
 
 // ["file.txt", "/folder/file.txt", "folder/file.txt", "../folder/file.txt", "../../folder/file.txt", "/", "."].forEach(
 //     (path) => {
@@ -50,10 +53,10 @@ computer.commandDriver.addCommand(lsCommand);
 //     },
 // );
 
-computer.filesystem.makeDirectory("/folder");
-computer.filesystem.makeFile("/folder", new File({ name: "file.txt", content: "Hello, world!" }));
-computer.filesystem.makeDirectory("/folder/subfolder");
-computer.filesystem.makeFile("/folder/subfolder", new File({ name: "file2.txt", content: "Hello, world!" }));
+computer.consoleHost.runCommand("mkdir /folder");
+computer.consoleHost.runCommand("touch /folder/file.txt");
+computer.consoleHost.runCommand("mkdir /folder/subfolder");
+computer.consoleHost.runCommand("touch /folder/subfolder/file2.txt");
 
 // Test ls
 // computer.commandDriver.runCommandString("ls / -r", { currentWorkingDirectory: computer.filesystem.root });
