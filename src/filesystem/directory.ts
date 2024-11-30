@@ -79,6 +79,7 @@ export class Directory {
 
     /**
      * Gets a file (only if it is in the current directory).
+     * @deprecated
      * @param name - The file name.
      * @returns The file, if found.
      * @example directory.getFileInDirectory("file.txt") // File { name: "file.txt", ... }
@@ -133,5 +134,100 @@ export class Directory {
         }
 
         return currentDirectory;
+    }
+
+    public getParentDirectoryOfPath(pathOrParts: string | string[]): Directory | undefined {
+        const pathParts = typeof pathOrParts === "string" ? Filesystem.getPathParts(pathOrParts) : pathOrParts;
+
+        // Get the file's parent directory
+        const parentDirectoryPathParts = pathParts.slice(0, -1);
+        const parentDirectory = this.getDirectory(parentDirectoryPathParts);
+
+        // If the parent directory is not found, log an error
+        if (!parentDirectory) {
+            log(`Directory "${Filesystem.partsToPath(parentDirectoryPathParts)}" not found`, LogLevel.Error);
+            return;
+        }
+
+        return parentDirectory;
+    }
+
+    /**
+     * Gets a file by path.
+     * @param pathOrParts - The file path or path parts.
+     * @returns The file, if found.
+     */
+    public getFile(pathOrParts: string | string[]): File | undefined {
+        const pathParts = typeof pathOrParts === "string" ? Filesystem.getPathParts(pathOrParts) : pathOrParts;
+        const fileName = pathParts[pathParts.length - 1];
+
+        // Get the file's parent directory
+        const parentDirectory = this.getParentDirectoryOfPath(pathParts);
+
+        // Find the file in the parent directory
+        return parentDirectory?.getFileInDirectory(fileName);
+    }
+
+    /**
+     * Creates a directory.
+     * @param pathOrParts - The directory path or path parts.
+     * @example
+     * makeDirectory("/folder") // Creates a directory named "folder" in the current directory
+     * makeDirectory("/folder/subfolder") // Creates a directory named "subfolder" in the "folder" directory (note: "folder" must already exist)
+     */
+    // TODO: Move this to the directory class
+    public makeDirectory(pathOrParts: string | string[]): void {
+        // Split the path into parts
+        const parts = typeof pathOrParts === "string" ? Filesystem.getPathParts(pathOrParts) : pathOrParts;
+
+        // Get the parent directory
+        const parentDirectory = this.getParentDirectoryOfPath(parts);
+
+        // debug: log parent directory and parts
+        // log("makeDirectory:", LogLevel.Debug, {
+        //     parentDirectory,
+        //     parts,
+        // });
+
+        // If the parent directory is not found, log an error
+        if (!parentDirectory) {
+            log(`Directory "${Filesystem.partsToPath(parts.slice(0, -1))}" not found`, LogLevel.Error);
+            return;
+        }
+
+        // Create the new directory
+        const newDirectory = new Directory({
+            // parts[parts.length - 1]
+            name: parts[parts.length - 1],
+            parent: parentDirectory,
+        });
+
+        // Add the new directory to the parent directory
+        parentDirectory.contents.push(newDirectory);
+    }
+
+    /**
+     * Adds a file.
+     * @param pathOrParts - The file path (not including the file name).
+     * @param fileToAdd - The file to add.
+     * @example
+     * addFile("/folder", new File({ name: "file.txt", content: "Hello, world" })) // Adds a file named "file.txt" to the "folder" directory
+     */
+    // TODO: Move this to the directory class
+    public makeFile(pathOrParts: string | string[], fileToAdd: File): void {
+        // Get the parent directory
+        const parentDirectory = this.getDirectory(pathOrParts);
+
+        // If the parent directory is not found, log an error
+        if (!parentDirectory) {
+            log(
+                `Directory "${typeof pathOrParts === "string" ? pathOrParts : Filesystem.partsToPath(pathOrParts)}" not found`,
+                LogLevel.Error,
+            );
+            return;
+        }
+
+        // Add the new file to the parent directory
+        parentDirectory.addContent(fileToAdd);
     }
 }

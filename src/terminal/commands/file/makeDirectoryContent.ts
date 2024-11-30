@@ -71,7 +71,7 @@ export const mkdirCommand = new Command({
     // The function to run when the command is called
     // onCommand: mkdirAndTouchOnCommandFactory("directory"),
     onCommand: (options): void => {
-        options.consoleHost.computer.filesystem.makeDirectory(options.args[0], options.currentWorkingDirectory);
+        options.currentWorkingDirectory.makeDirectory(options.args[0]);
     },
 });
 
@@ -99,10 +99,39 @@ export const touchCommand = new Command({
         const parentDirectoryParts = pathParts.slice(0, -1);
         const fileName = pathParts[pathParts.length - 1];
 
-        options.consoleHost.computer.filesystem.makeFile(
-            parentDirectoryParts,
-            new File({ name: fileName, content: "" }),
-            options.currentWorkingDirectory,
-        );
+        options.currentWorkingDirectory.makeFile(parentDirectoryParts, new File({ name: fileName, content: "" }));
     },
 });
+
+// export const catCommand = new Command({
+//     name: "cat",
+//     description: "Print the contents of a file",
+
+//     // The arguments for the command
+//     arguments: [
+//         {
+//             names: "path",
+//             description: "The path of the file to read",
+//             defaultValue: "",
+//             required: true,
+//         },
+//     ],
+
+//     // The flags for the command
+//     flags: [],
+
+//     // The function to run when the command is called
+//     onCommand: (options): void => {
+//         const pathParts = Filesystem.getPathParts(options.args[0]);
+//         const fileName = pathParts[pathParts.length - 1];
+
+//         const file = options.currentWorkingDirectory.getFile(fileName);
+
+//         if (!file) {
+//             log(`File "${fileName}" not found`, LogLevel.Error);
+//             return;
+//         }
+
+//         log(file.content, LogLevel.Log);
+//     },
+// });

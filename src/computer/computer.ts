@@ -44,11 +44,9 @@ export class Computer {
 const computer = new Computer();
 
 // Add the built-in commands
-computer.commandDriver.addCommand(lsCommand);
-computer.commandDriver.addCommand(mkdirCommand);
-computer.commandDriver.addCommand(touchCommand);
-computer.commandDriver.addCommand(cdCommand);
-computer.commandDriver.addCommand(pwdCommand);
+[lsCommand, mkdirCommand, touchCommand, cdCommand, pwdCommand].forEach((command) => {
+    computer.commandDriver.addCommand(command);
+});
 
 // ["file.txt", "/folder/file.txt", "folder/file.txt", "../folder/file.txt", "../../folder/file.txt", "/", "."].forEach(
 //     (path) => {
@@ -56,17 +54,18 @@ computer.commandDriver.addCommand(pwdCommand);
 //     },
 // );
 
-computer.consoleHost.runCommand("mkdir /folder");
-computer.consoleHost.runCommand("touch /folder/file.txt");
-computer.consoleHost.runCommand("mkdir /folder/subfolder");
-computer.consoleHost.runCommand("touch /folder/subfolder/file2.txt");
-
-// Test ls
-// computer.commandDriver.runCommandString("ls / -r", { currentWorkingDirectory: computer.filesystem.root });
-computer.consoleHost.runCommand("ls / -r");
-computer.consoleHost.runCommand("cd /folder");
-computer.consoleHost.runCommand("pwd");
-computer.consoleHost.runCommand("ls");
+[
+    "mkdir /folder",
+    "touch /folder/file.txt",
+    "mkdir /folder/subfolder",
+    "touch /folder/subfolder/file2.txt",
+    "ls / -r",
+    "cd /folder",
+    "pwd",
+    "ls",
+].forEach((command) => {
+    computer.consoleHost.runCommand(command);
+});
 
 // Privilege test
 // const adminOnlyCommand = new Command({
