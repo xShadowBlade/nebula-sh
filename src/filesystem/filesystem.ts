@@ -65,18 +65,20 @@ export class Filesystem {
 
     /**
      * Adds a file.
-     * @param path - The file path (not including the file name).
+     * @param pathOrParts - The file path (not including the file name).
      * @param fileToAdd - The file to add.
+     * @param currentWorkingDirectory - The current working directory.
      * @example
      * addFile("/folder", new File({ name: "file.txt", content: "Hello, world" })) // Adds a file named "file.txt" to the "folder" directory
      */
-    public makeFile(path: string, fileToAdd: File): void {
+    // TODO: Move this to the directory class
+    public makeFile(pathOrParts: string | string[], fileToAdd: File, currentWorkingDirectory: Directory = this.root): void {
         // Get the parent directory
-        const parentDirectory = this.getDirectory(path);
+        const parentDirectory = currentWorkingDirectory.getDirectory(pathOrParts);
 
         // If the parent directory is not found, log an error
         if (!parentDirectory) {
-            log(`Directory "${path}" not found`, LogLevel.Error);
+            log(`Directory "${pathOrParts}" not found`, LogLevel.Error);
             return;
         }
 
@@ -90,6 +92,7 @@ export class Filesystem {
      * @param pathOrParts - The path or path parts.
      * @returns The directory, if found.
      */
+    // TODO: Move this to the directory class
     public getDirectory(pathOrParts: string | string[]): Directory | undefined {
         // Split the path into parts
         const parts = typeof pathOrParts === "string" ? Filesystem.getPathParts(pathOrParts) : pathOrParts;
@@ -112,17 +115,19 @@ export class Filesystem {
 
     /**
      * Creates a directory.
-     * @param path - The directory path.
+     * @param pathOrParts - The directory path or path parts.
+     * @param currentWorkingDirectory - The current working directory.
      * @example
      * makeDirectory("/folder") // Creates a directory named "folder" in the root directory
      * makeDirectory("/folder/subfolder") // Creates a directory named "subfolder" in the "folder" directory (note: "folder" must already exist)
      */
-    public makeDirectory(path: string): void {
+    // TODO: Move this to the directory class
+    public makeDirectory(pathOrParts: string | string[], currentWorkingDirectory: Directory = this.root): void {
         // Split the path into parts
-        const parts = Filesystem.getPathParts(path);
+        const parts = typeof pathOrParts === "string" ? Filesystem.getPathParts(pathOrParts) : pathOrParts;
 
         // Get the parent directory
-        const parentDirectory = this.getDirectory(parts.slice(0, -1));
+        const parentDirectory = currentWorkingDirectory.getDirectory(parts.slice(0, -1));
 
         // debug: log parent directory and parts
         // log("makeDirectory:", LogLevel.Debug, {
