@@ -14,6 +14,7 @@ import { ConsoleHost } from "../terminal/consoleHost";
 
 import { lsCommand } from "../terminal/commands/file/ls";
 import { mkdirCommand, touchCommand } from "../terminal/commands/file/makeDirectoryContent";
+import { cdCommand, pwdCommand } from "../terminal/commands/dir/cd";
 
 /**
  * The computer class.
@@ -46,6 +47,8 @@ const computer = new Computer();
 computer.commandDriver.addCommand(lsCommand);
 computer.commandDriver.addCommand(mkdirCommand);
 computer.commandDriver.addCommand(touchCommand);
+computer.commandDriver.addCommand(cdCommand);
+computer.commandDriver.addCommand(pwdCommand);
 
 // ["file.txt", "/folder/file.txt", "folder/file.txt", "../folder/file.txt", "../../folder/file.txt", "/", "."].forEach(
 //     (path) => {
@@ -61,6 +64,9 @@ computer.consoleHost.runCommand("touch /folder/subfolder/file2.txt");
 // Test ls
 // computer.commandDriver.runCommandString("ls / -r", { currentWorkingDirectory: computer.filesystem.root });
 computer.consoleHost.runCommand("ls / -r");
+computer.consoleHost.runCommand("cd /folder");
+computer.consoleHost.runCommand("pwd");
+computer.consoleHost.runCommand("ls");
 
 // Privilege test
 // const adminOnlyCommand = new Command({

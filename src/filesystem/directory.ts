@@ -3,6 +3,7 @@
  */
 import { Filesystem } from "./filesystem";
 import { File } from "./file";
+import { log, LogLevel } from "../terminal/utils/log";
 
 /**
  * The possible contents of a directory.
@@ -47,6 +48,12 @@ export class Directory {
      * @returns The directory's path
      */
     public get path(): string {
+        // debug
+        // log("parent:", LogLevel.Debug, {
+        //     parentName: this.parent?.name,
+        //     name: this.name,
+        // });
+
         return this.parent ? `${this.parent.path}/${this.name}` : this.name;
     }
 

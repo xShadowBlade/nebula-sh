@@ -7,10 +7,12 @@ import type { Computer } from "../computer/computer";
 // import { Command } from "./commands/commands";
 import type { Directory } from "../filesystem/directory";
 import { Privileges } from "../computer/privileges";
+import { log, LogLevel } from "./utils/log";
 
 /**
  * The console host.
  */
+// TODO: Add users
 export class ConsoleHost {
     /**
      * The command driver.
@@ -51,6 +53,9 @@ export class ConsoleHost {
      * @param options - The command options.
      */
     public runCommand(command: string, options?: Parameters<CommandDriver["runCommandString"]>[2]): void {
+        // TODO: Switch to xterm.js
+        log(this.currentWorkingDirectory.path || "/", LogLevel.Shell, command);
+
         this.commandDriver.runCommandString(command, this, options);
     }
 }

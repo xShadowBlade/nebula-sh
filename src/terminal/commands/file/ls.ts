@@ -77,8 +77,8 @@ export const lsCommand = new Command({
     // The command function
     onCommand: (options): void => {
         const { args, flags, currentWorkingDirectory } = options;
-        log("args:", LogLevel.Info, args);
-        log("flags:", LogLevel.Info, flags);
+        // log("args:", LogLevel.Info, args);
+        // log("flags:", LogLevel.Info, flags);
 
         // Get the directory
         const directory = args[0] ? currentWorkingDirectory.getDirectory(args[0]) : currentWorkingDirectory;
