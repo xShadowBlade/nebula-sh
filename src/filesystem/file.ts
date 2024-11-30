@@ -1,6 +1,8 @@
 /**
  * @file Declares the file class.
  */
+import { compressToBase64, decompressFromBase64 } from "lz-string";
+import type { Directory } from "./directory";
 
 /**
  * Represents the parts of a file.
@@ -20,6 +22,15 @@ export interface FileParts {
 }
 
 /**
+ * Represents file options.
+ */
+interface FileOptions {
+    name: string;
+    content: string;
+    parent?: Directory | null;
+}
+
+/**
  * Represents a file.
  */
 export class File {
@@ -30,6 +41,11 @@ export class File {
      * @example "file.txt"
      */
     public name: string;
+
+    /**
+     * The file's parent directory.
+     */
+    public parent: Directory | null;
 
     /**
      * The file's content.
@@ -44,6 +60,25 @@ export class File {
     }
 
     /**
+     * @returns The file's path.
+     */
+    public get path(): string {
+        return this.parent ? `${this.parent.path}/${this.name}` : this.name;
+    }
+
+    /**
+     * Constructs a new file.
+     * @param options - The file options. See {@link FileOptions}.
+     */
+    public constructor(options: FileOptions) {
+        const { name, content, parent } = options;
+
+        this.name = name;
+        this.content = content;
+        this.parent = parent || null;
+    }
+
+    /**
      * Gets the file's parts. See {@link FileParts}.
      * @returns The file's parts.
      */
@@ -51,20 +86,21 @@ export class File {
         const parts = this.name.split(".");
         return {
             name: parts[0],
-            extension: parts[1]
+            extension: parts[1],
         };
     }
 
     /**
-     * Constructs a new file.
-     * @param name - The file's name.
-     * @param content - The file's content.
+     * Compresses the file's content to a base64 string.
+     * @returns The compressed content.
      */
-    public constructor(name: string, content: string) {
-        this.name = name;
-        this.content = content;
+    public toString(): string {
+        return compressToBase64(JSON.stringify({
+            name: this.name,
+            content: this.content,
+        }));
     }
 }
 
 // Test
-const file = new File("file.txt", "Hello, world!");
+// const file = new File("file.txt", "Hello, world!");

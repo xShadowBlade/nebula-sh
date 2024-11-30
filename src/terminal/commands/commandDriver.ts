@@ -1,6 +1,7 @@
 /**
  * @file Declares the command driver class.
  */
+import { log, LogLevel } from "../utils/log";
 import { Command } from "./commands";
 import type { CommandFlag, FlagTypes } from "./commands";
 
@@ -28,7 +29,9 @@ export class CommandDriver {
      */
     private static parseValue(value: string): FlagTypes {
         // TODO: Add support for escaping quotes
-        if (value.includes(`"`)) throw new Error(`Invalid value: ${value}`);
+        if (value.includes(`"`)) {
+            log(`Quotes are not supported in flags: ${value}`, LogLevel.Error);
+        }
 
         if (value === "true") return true;
         if (value === "false") return false;
@@ -79,7 +82,7 @@ export class CommandDriver {
 
         // If the command is not found, log an error
         if (!commandToRun) {
-            console.error(`Command "${name}" not found`);
+            log(`Command "${name}" not found`, LogLevel.Error);
             return;
         }
 
@@ -131,7 +134,7 @@ export class CommandDriver {
         try {
             commandToRun.onCommand(args, flagsWithDefaults);
         } catch (e) {
-            console.error(e);
+            log(e, LogLevel.Error);
         }
     }
 }
@@ -150,8 +153,10 @@ const lsCommand = new Command({
         } as CommandFlag<"all", boolean>,
     ] satisfies CommandFlag[],
     onCommand: (args, flags): void => {
-        console.log("args", args);
-        console.log("flags", flags);
+        // console.log("args", args);
+        // console.log("flags", flags);
+        log("args:", LogLevel.Info, args);
+        log("flags:", LogLevel.Info, flags);
     },
 });
 commandDriver.addCommand(lsCommand);
