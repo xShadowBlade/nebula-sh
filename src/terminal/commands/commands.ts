@@ -47,6 +47,24 @@ export interface CommandFlag<TPrimaryFlagName extends string = string, TFlagType
 }
 
 /**
+ * The command argument initializer.
+ * @example
+ * const directoryArgument: CommandArgument<string> = {
+ *     names: ["directory"],
+ *     description: "The directory to list",
+ *     defaultValue: "",
+ *     required: false,
+ * };
+ */
+export interface CommandArgument<TFlagType extends FlagTypes = FlagTypes> extends CommandFlag<string, TFlagType> {
+    /**
+     * If the argument is required.
+     * @example true
+     */
+    required: boolean;
+}
+
+/**
  * Gets the flag keys from an array of command flags.
  * @example
  * type MyFlags = [
@@ -77,15 +95,37 @@ export type ObjectFromEntries<T extends [string, unknown][]> = {
 // type MyFlagKeys = GetFlagRecord<MyFlags>; // { help: boolean, version: string }
 
 /**
+ * Gets the argument array type from an array of command flags.
+ * @example
+ * type MyArguments = [
+ *   CommandFlag<string>,
+ *   CommandFlag<number>,
+ * ];
+ * type MyArgs = GetArgsFromArray<MyArguments>; // [string, number]
+ */
+export type GetArgsFromArray<T extends CommandArgument[]> = {
+    [K in keyof T]: T[K] extends CommandArgument<infer TFlagType> ? TFlagType : never;
+};
+
+// test
+// type MyArguments = [CommandArgument<string>, CommandArgument<number>];
+// type MyArgs = GetArgsFromArray<MyArguments>; // [string, number]
+
+/**
  * The function called when a command is executed
+ * @template TArgs - The command arguments.
+ * @template TFlags - The command flags.
  * @param options - The command options.
  */
-export type OnCommand<TFlags extends CommandFlag[] = CommandFlag[]> = (options: {
+export type OnCommand<
+    TArgs extends CommandArgument[] = CommandArgument[],
+    TFlags extends CommandFlag[] = CommandFlag[],
+> = (options: {
     /**
      * The command arguments.
      * @example ["arg1", "arg2"]
      */
-    args: string[];
+    args: GetArgsFromArray<TArgs>;
 
     /**
      * The command flags.
@@ -116,18 +156,27 @@ export type OnCommand<TFlags extends CommandFlag[] = CommandFlag[]> = (options: 
  * The options for the command constructor.
  * See {@link Command}.
  */
-export interface CommandConstructorOptions<TFlags extends CommandFlag[]> {
+export interface CommandConstructorOptions<TArgs extends CommandArgument[], TFlags extends CommandFlag[]> {
     name: string;
     description: string;
-    flags: TFlags;
-    onCommand: OnCommand<TFlags>;
+
+    onCommand: OnCommand<TArgs, TFlags>;
     privilege?: Privileges;
+
+    // Special types for flags and arguments (for type inference)
+    flags: TFlags;
+    arguments: TArgs;
 }
 
 /**
  * A command.
+ * @template TArgs - The command arguments. See {@link CommandArgument}.
+ * @template TFlags - The command flags. See {@link CommandFlag}.
  */
-export class Command<TFlags extends CommandFlag[] = CommandFlag[]> {
+export class Command<
+    TArgs extends CommandArgument[] = CommandArgument[],
+    TFlags extends CommandFlag[] = CommandFlag[],
+> {
     /**
      * The command name.
      * @example "ls"
@@ -143,12 +192,12 @@ export class Command<TFlags extends CommandFlag[] = CommandFlag[]> {
     /**
      * The command arguments.
      */
-    public arguments: string[] = [];
+    public arguments: TArgs;
 
     /**
      * The command flags.
      */
-    public flags: TFlags = [] as unknown as TFlags;
+    public flags: TFlags;
 
     /**
      * The privileges required to run the command.
@@ -160,7 +209,7 @@ export class Command<TFlags extends CommandFlag[] = CommandFlag[]> {
      * @param args - The command arguments.
      * @param flags - The command flags.
      */
-    public onCommand: OnCommand<TFlags>;
+    public onCommand: OnCommand<TArgs, TFlags>;
 
     /**
      * Gets the default flags.
@@ -179,14 +228,17 @@ export class Command<TFlags extends CommandFlag[] = CommandFlag[]> {
      * Constructs a new command.
      * @param options - The command options.
      */
-    public constructor(options: CommandConstructorOptions<TFlags>) {
-        const { name, description, flags, onCommand } = options;
+    public constructor(options: CommandConstructorOptions<TArgs, TFlags>) {
+        const { name, description, flags, onCommand, privilege } = options;
 
         this.name = name;
         this.description = description;
-        this.flags = flags;
         this.onCommand = onCommand;
 
-        this.privilege = options.privilege ?? Privileges.User;
+        this.flags = flags ?? ([] as unknown as TFlags);
+        // Note: no destructuring assignment for arguments because it is a reserved word
+        this.arguments = options.arguments ?? ([] as unknown as TArgs);
+
+        this.privilege = privilege ?? Privileges.User;
     }
 }

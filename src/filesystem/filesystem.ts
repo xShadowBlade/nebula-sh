@@ -12,7 +12,7 @@ export class Filesystem {
     /**
      * The root directory.
      */
-    public root = new Directory({ name: "" });
+    public root = new Directory({ name: "", isRoot: true });
 
     /**
      * Separates a path into parts.
@@ -27,6 +27,11 @@ export class Filesystem {
         // Split the path into parts
         const parts = path.split("/").filter((part) => part !== "");
 
+        // If the path is empty, return "."
+        if (parts.length === 1 && (parts[0] === "." || parts[0] === "/")) {
+            return parts as ["." | "/"];
+        }
+
         // If the path is absolute, add a leading slash
         if (path.startsWith("/")) {
             parts.unshift("/");
@@ -36,7 +41,7 @@ export class Filesystem {
         }
 
         // Parse ".." and "."
-        if (parts.length === 1) return parts as ["." | "/"];
+        // if (parts.length === 1) return parts as ["." | "/"];
 
         // If the first ".." is found, make it ".", "."
         if (parts[1] === "..") {
@@ -63,7 +68,7 @@ export class Filesystem {
      * @param path - The file path (not including the file name).
      * @param fileToAdd - The file to add.
      * @example
-     * addFile("/folder", new File({ name: "file.txt", content: "Hello, world })) // Adds a file named "file.txt" to the "folder" directory
+     * addFile("/folder", new File({ name: "file.txt", content: "Hello, world" })) // Adds a file named "file.txt" to the "folder" directory
      */
     public makeFile(path: string, fileToAdd: File): void {
         // Get the parent directory

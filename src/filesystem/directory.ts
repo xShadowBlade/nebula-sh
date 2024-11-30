@@ -14,6 +14,7 @@ export type DirectoryContent = Directory | File;
 interface DirectoryOptions {
     name: string;
     parent?: Directory | null;
+    isRoot?: boolean;
 }
 
 /**
@@ -37,6 +38,11 @@ export class Directory {
     public parent: Directory | null;
 
     /**
+     * Whether the directory is the root directory.
+     */
+    public isRoot: boolean;
+
+    /**
      * @returns The directory's path
      */
     public get path(): string {
@@ -48,10 +54,11 @@ export class Directory {
      * @param options - The directory options.
      */
     public constructor(options: DirectoryOptions) {
-        const { name, parent } = options;
+        const { name, parent, isRoot } = options;
 
         this.name = name;
-        this.parent = parent || null;
+        this.parent = parent ?? null;
+        this.isRoot = isRoot ?? false;
     }
 
     /**
@@ -81,9 +88,12 @@ export class Directory {
         const pathParts = typeof pathOrParts === "string" ? Filesystem.getPathParts(pathOrParts) : pathOrParts;
 
         // If the path is absolute, throw an error
-        if (pathParts[0] !== ".") {
+        if (!this.isRoot && pathParts[0] !== ".") {
             throw new Error(`Path "${pathOrParts as string}" must be relative`);
         }
+
+        // If the path is just ".", return the current directory
+        if (pathParts.length === 1) return this;
 
         /**
          * The current directory, used to traverse the path.

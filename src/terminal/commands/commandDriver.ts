@@ -63,7 +63,7 @@ export class CommandDriver {
      * Adds a command.
      * @param command - The command to add.
      */
-    public addCommand(command: Command): void {
+    public addCommand(command: Command<any>): void {
         this.commands.push(command);
     }
 
@@ -135,7 +135,7 @@ export class CommandDriver {
         }
 
         // For each part, check if it is a flag
-        const args: string[] = [];
+        const args: FlagTypes[] = [];
         const flagsBeforeProcessed = {} as Record<string, FlagTypes>;
 
         // For each part, check if it is a flag
@@ -148,7 +148,7 @@ export class CommandDriver {
 
             // If it is not a flag, it is an argument
             if (!flagMatch) {
-                args.push(part);
+                args.push(CommandDriver.parseValue(part));
                 return;
             }
 
@@ -178,6 +178,20 @@ export class CommandDriver {
 
         // Assign default values to flags
         const flagsWithDefaults = Object.assign({}, commandToRun.getDefaultFlags(), flagsProcessed);
+
+        // Process the arguments
+        commandToRun.arguments.forEach((argument, index) => {
+            // If the argument is required and not provided, log an error
+            if (argument.required && !args[index]) {
+                log(`Argument "${argument.names}" is required`, LogLevel.Error);
+                return;
+            }
+
+            // If the argument is not provided, assign the default value
+            if (!args[index]) {
+                args[index] = argument.defaultValue;
+            }
+        });
 
         // Run the command
         this.runCommand(commandToRun, {
