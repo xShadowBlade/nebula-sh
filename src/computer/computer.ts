@@ -9,6 +9,7 @@ import { File } from "../filesystem/file";
 import { log, LogLevel } from "../terminal/utils/log";
 
 import type { CommandFlag } from "../terminal/commands/commands";
+import { Privileges } from "./privileges";
 
 /**
  * The computer class.
@@ -92,3 +93,19 @@ const lsCommand = new Command({
 computer.commandDriver.addCommand(lsCommand);
 
 computer.commandDriver.runCommandString("ls", { currentWorkingDirectory: computer.filesystem.getDirectory("/folder") });
+
+// Privilege test
+const adminOnlyCommand = new Command({
+    name: "admin",
+    description: "Admin-only command",
+    flags: [] as CommandFlag[],
+
+    onCommand: (options): void => {
+        log("Admin command run", LogLevel.Log);
+    },
+    privilege: Privileges.Admin,
+});
+computer.commandDriver.addCommand(adminOnlyCommand);
+
+// Attempt to run the admin command as a user
+computer.commandDriver.runCommandString("admin", { privilege: Privileges.User });

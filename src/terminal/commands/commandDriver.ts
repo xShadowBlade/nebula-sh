@@ -2,9 +2,10 @@
  * @file Declares the command driver class.
  */
 import { log, LogLevel } from "../utils/log";
-import { Command } from "./commands";
+import type { Command } from "./commands";
 import type { CommandFlag, FlagTypes, OnCommand } from "./commands";
 import type { Computer } from "../../computer/computer";
+import { checkPrivilege, Privileges } from "../../computer/privileges";
 
 /**
  * Wraps a set of commands and runs them.
@@ -52,6 +53,7 @@ export class CommandDriver {
 
     /**
      * Constructs a new command driver.
+     * @param computer - The computer instance.
      */
     public constructor(computer: Computer) {
         this.computerReference = computer;
@@ -85,20 +87,29 @@ export class CommandDriver {
 
         // If the command is not found, log an error
         if (!commandToRun) {
-            log(`Command "${nameOrCommand}" not found`, LogLevel.Error);
+            log(`Command "${nameOrCommand as string}" not found`, LogLevel.Error);
+            return;
+        }
+
+        const commandOptions = {
+            // Default options
+            args: [],
+            flags: {},
+            computer: this.computerReference,
+            currentWorkingDirectory: this.computerReference.filesystem.root,
+            privilege: Privileges.User,
+
+            ...options,
+        };
+
+        // If the privilege level is not high enough, log an error
+        if (commandToRun.privilege && checkPrivilege(commandOptions.privilege, commandToRun.privilege) === false) {
+            log(`Insufficient privileges to run command "${commandToRun.name}"`, LogLevel.Error);
             return;
         }
 
         try {
-            commandToRun.onCommand({
-                // Default options
-                args: [],
-                flags: {},
-                computer: this.computerReference,
-                currentWorkingDirectory: this.computerReference.filesystem.root,
-
-                ...options,
-            });
+            commandToRun.onCommand(commandOptions);
         } catch (e) {
             log(e, LogLevel.Error);
         }

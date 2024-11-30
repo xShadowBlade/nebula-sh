@@ -2,6 +2,7 @@
  * @file Handles the commands for the terminal.
  */
 import type { Computer } from "../../computer/computer";
+import { Privileges } from "../../computer/privileges";
 import type { Directory } from "../../filesystem/directory";
 
 /**
@@ -77,6 +78,7 @@ export type ObjectFromEntries<T extends [string, unknown][]> = {
 
 /**
  * The function called when a command is executed
+ * @param options - The command options.
  */
 export type OnCommand<TFlags extends CommandFlag[] = CommandFlag[]> = (options: {
     /**
@@ -101,6 +103,11 @@ export type OnCommand<TFlags extends CommandFlag[] = CommandFlag[]> = (options: 
      */
     currentWorkingDirectory: Directory;
 
+    /**
+     * The privilege level of the user.
+     */
+    privilege: Privileges;
+
     // TODO: Add support for async functions
 // TODO: Add support for return values
 }) => void;
@@ -114,6 +121,7 @@ export interface CommandConstructorOptions<TFlags extends CommandFlag[]> {
     description: string;
     flags: TFlags;
     onCommand: OnCommand<TFlags>;
+    privilege?: Privileges;
 }
 
 /**
@@ -141,6 +149,11 @@ export class Command<TFlags extends CommandFlag[] = CommandFlag[]> {
      * The command flags.
      */
     public flags: TFlags = [] as unknown as TFlags;
+
+    /**
+     * The privileges required to run the command.
+     */
+    public privilege: Privileges;
 
     /**
      * The command function.
@@ -173,5 +186,7 @@ export class Command<TFlags extends CommandFlag[] = CommandFlag[]> {
         this.description = description;
         this.flags = flags;
         this.onCommand = onCommand;
+
+        this.privilege = options.privilege ?? Privileges.User;
     }
 }
