@@ -10,6 +10,8 @@ import { log, LogLevel } from "../terminal/utils/log";
 
 import type { CommandFlag } from "../terminal/commands/commands";
 import { Privileges } from "./privileges";
+import { ConsoleHost } from "../terminal/consoleHost";
+
 import { lsCommand } from "../terminal/commands/file/ls";
 
 /**
@@ -20,13 +22,19 @@ export class Computer {
      * The command driver.
      * See {@link CommandDriver}
      */
-    public commandDriver = new CommandDriver(this);
+    public commandDriver = new CommandDriver();
 
     /**
      * The filesystem.
      * See {@link Filesystem}
      */
     public filesystem = new Filesystem();
+
+    /**
+     * The console host.
+     * See {@link ConsoleHost}
+     */
+    public consoleHost = new ConsoleHost(this, this.commandDriver);
 }
 
 // TODO: Move these tests to an actual test file
@@ -48,7 +56,8 @@ computer.filesystem.makeDirectory("/folder/subfolder");
 computer.filesystem.makeFile("/folder/subfolder", new File({ name: "file2.txt", content: "Hello, world!" }));
 
 // Test ls
-computer.commandDriver.runCommandString("ls / -r", { currentWorkingDirectory: computer.filesystem.root });
+// computer.commandDriver.runCommandString("ls / -r", { currentWorkingDirectory: computer.filesystem.root });
+computer.consoleHost.runCommand("ls / -r");
 
 // Privilege test
 // const adminOnlyCommand = new Command({

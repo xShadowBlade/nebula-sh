@@ -4,8 +4,8 @@
 import { log, LogLevel } from "../utils/log";
 import type { Command } from "./commands";
 import type { CommandFlag, FlagTypes, OnCommand } from "./commands";
-import type { Computer } from "../../computer/computer";
-import { checkPrivilege, Privileges } from "../../computer/privileges";
+import type { ConsoleHost } from "../consoleHost";
+import { checkPrivilege } from "../../computer/privileges";
 
 /**
  * Wraps a set of commands and runs them.
@@ -48,16 +48,24 @@ export class CommandDriver {
 
     /**
      * The computer instance.
+     * @deprecated Use {@link consoleHostReference} instead.
      */
-    private computerReference: Computer;
+    // private computerReference: Computer;
+
+    /**
+     * The console host reference.
+     */
+    // private consoleHostReference: ConsoleHost;
 
     /**
      * Constructs a new command driver.
      * @param computer - The computer instance.
+     * @param consoleHost - The console host.
      */
-    public constructor(computer: Computer) {
-        this.computerReference = computer;
-    }
+    // public constructor(computer: Computer, consoleHost: ConsoleHost) {
+    //     this.computerReference = computer;
+    //     this.consoleHostReference = consoleHost;
+    // }
 
     /**
      * Adds a command.
@@ -79,9 +87,14 @@ export class CommandDriver {
     /**
      * Runs a command.
      * @param nameOrCommand - The command name or command.
+     * @param consoleHost - The console host. See {@link ConsoleHost}.
      * @param options - The command options. See {@link OnCommand}.
      */
-    public runCommand(nameOrCommand: string | Command, options: Partial<Parameters<OnCommand>[0]> = {}): void {
+    public runCommand(
+        nameOrCommand: string | Command,
+        consoleHost: ConsoleHost,
+        options: Partial<Omit<Parameters<OnCommand>[0], "consoleHost" | "currentWorkingDirectory">> = {},
+    ): void {
         // If the command is a string, get the command by name
         const commandToRun = typeof nameOrCommand === "string" ? this.getCommand(nameOrCommand) : nameOrCommand;
 
@@ -91,13 +104,13 @@ export class CommandDriver {
             return;
         }
 
-        const commandOptions = {
+        const commandOptions: Parameters<OnCommand>[0] = {
             // Default options
             args: [],
             flags: {},
-            computer: this.computerReference,
-            currentWorkingDirectory: this.computerReference.filesystem.root,
-            privilege: Privileges.User,
+            consoleHost: consoleHost,
+            currentWorkingDirectory: consoleHost.currentWorkingDirectory,
+            privilege: consoleHost.currentPrivilege,
 
             ...options,
         };
@@ -118,9 +131,14 @@ export class CommandDriver {
     /**
      * Runs a command string.
      * @param commandString - The command string.
+     * @param consoleHost - The console host. See {@link ConsoleHost}.
      * @param options - The command options. See {@link OnCommand}.
      */
-    public runCommandString(commandString: string, options: Partial<Parameters<OnCommand>[0]> = {}): void {
+    public runCommandString(
+        commandString: string,
+        consoleHost: ConsoleHost,
+        options?: Parameters<CommandDriver["runCommand"]>[1],
+    ): void {
         // First, split the command string into parts
         const parts = commandString.split(" ");
 
@@ -194,7 +212,7 @@ export class CommandDriver {
         });
 
         // Run the command
-        this.runCommand(commandToRun, {
+        this.runCommand(commandToRun, consoleHost, {
             args,
             flags: flagsWithDefaults,
             ...options,

@@ -1,7 +1,7 @@
 /**
  * @file Handles the commands for the terminal.
  */
-import type { Computer } from "../../computer/computer";
+import type { ConsoleHost } from "../consoleHost";
 import { Privileges } from "../../computer/privileges";
 import type { Directory } from "../../filesystem/directory";
 
@@ -134,14 +134,14 @@ export type OnCommand<
     flags: GetFlagRecord<TFlags>;
 
     /**
-     * The computer instance.
-     */
-    computer: Computer;
-
-    /**
      * The current directory.
      */
     currentWorkingDirectory: Directory;
+
+    /**
+     * The console host
+     */
+    consoleHost: ConsoleHost;
 
     /**
      * The privilege level of the user.
