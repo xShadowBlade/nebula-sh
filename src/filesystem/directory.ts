@@ -55,6 +55,14 @@ export class Directory {
     }
 
     /**
+     * Adds a file or directory to the directory.
+     * @param content - The content to add.
+     */
+    public addContent(content: DirectoryContent): void {
+        this.contents.push(content);
+    }
+
+    /**
      * Gets a file (only if it is in the current directory).
      * @param name - The file name.
      * @returns The file, if found.

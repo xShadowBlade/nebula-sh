@@ -59,6 +59,27 @@ export class Filesystem {
     }
 
     /**
+     * Adds a file.
+     * @param path - The file path (not including the file name).
+     * @param fileToAdd - The file to add.
+     * @example
+     * addFile("/folder", new File({ name: "file.txt", content: "Hello, world })) // Adds a file named "file.txt" to the "folder" directory
+     */
+    public makeFile(path: string, fileToAdd: File): void {
+        // Get the parent directory
+        const parentDirectory = this.getDirectory(path);
+
+        // If the parent directory is not found, log an error
+        if (!parentDirectory) {
+            log(`Directory "${path}" not found`, LogLevel.Error);
+            return;
+        }
+
+        // Add the new file to the parent directory
+        parentDirectory.addContent(fileToAdd);
+    }
+
+    /**
      * Gets a directory by path.
      * @deprecated Use {@link getDirectory} in {@link Filesystem.root} instead.
      * @param pathOrParts - The path or path parts.
@@ -78,7 +99,7 @@ export class Filesystem {
         parts[0] = ".";
 
         // Debug: log parts
-        log("getDirectory parts:", LogLevel.Debug, parts);
+        // log("getDirectory parts:", LogLevel.Debug, parts);
 
         // Get the directory
         return this.root.getDirectory(parts);
@@ -99,10 +120,10 @@ export class Filesystem {
         const parentDirectory = this.getDirectory(parts.slice(0, -1));
 
         // debug: log parent directory and parts
-        log("makeDirectory:", LogLevel.Debug, {
-            parentDirectory,
-            parts,
-        });
+        // log("makeDirectory:", LogLevel.Debug, {
+        //     parentDirectory,
+        //     parts,
+        // });
 
         // If the parent directory is not found, log an error
         if (!parentDirectory) {

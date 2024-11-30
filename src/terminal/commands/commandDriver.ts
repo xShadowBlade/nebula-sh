@@ -3,7 +3,8 @@
  */
 import { log, LogLevel } from "../utils/log";
 import { Command } from "./commands";
-import type { CommandFlag, FlagTypes } from "./commands";
+import type { CommandFlag, FlagTypes, OnCommand } from "./commands";
+import type { Computer } from "../../computer/computer";
 
 /**
  * Wraps a set of commands and runs them.
@@ -45,11 +46,16 @@ export class CommandDriver {
     private commands: Command[] = [];
 
     /**
+     * The computer instance.
+     */
+    private computerReference: Computer;
+
+    /**
      * Constructs a new command driver.
      */
-    // public constructor() {
-    //     this.commands = [];
-    // }
+    public constructor(computer: Computer) {
+        this.computerReference = computer;
+    }
 
     /**
      * Adds a command.
@@ -69,10 +75,41 @@ export class CommandDriver {
     }
 
     /**
+     * Runs a command.
+     * @param nameOrCommand - The command name or command.
+     * @param options - The command options. See {@link OnCommand}.
+     */
+    public runCommand(nameOrCommand: string | Command, options: Partial<Parameters<OnCommand>[0]> = {}): void {
+        // If the command is a string, get the command by name
+        const commandToRun = typeof nameOrCommand === "string" ? this.getCommand(nameOrCommand) : nameOrCommand;
+
+        // If the command is not found, log an error
+        if (!commandToRun) {
+            log(`Command "${nameOrCommand}" not found`, LogLevel.Error);
+            return;
+        }
+
+        try {
+            commandToRun.onCommand({
+                // Default options
+                args: [],
+                flags: {},
+                computer: this.computerReference,
+                currentWorkingDirectory: this.computerReference.filesystem.root,
+
+                ...options,
+            });
+        } catch (e) {
+            log(e, LogLevel.Error);
+        }
+    }
+
+    /**
      * Runs a command string.
      * @param commandString - The command string.
+     * @param options - The command options. See {@link OnCommand}.
      */
-    public runCommandString(commandString: string): void {
+    public runCommandString(commandString: string, options: Partial<Parameters<OnCommand>[0]> = {}): void {
         // First, split the command string into parts
         const parts = commandString.split(" ");
 
@@ -90,6 +127,7 @@ export class CommandDriver {
         const args: string[] = [];
         const flagsBeforeProcessed = {} as Record<string, FlagTypes>;
 
+        // For each part, check if it is a flag
         parts.forEach((part, index) => {
             // If `index` is 0, it is the command name (already handled, so skip)
             if (index === 0) return;
@@ -131,34 +169,10 @@ export class CommandDriver {
         const flagsWithDefaults = Object.assign({}, commandToRun.getDefaultFlags(), flagsProcessed);
 
         // Run the command
-        try {
-            commandToRun.onCommand(args, flagsWithDefaults);
-        } catch (e) {
-            log(e, LogLevel.Error);
-        }
+        this.runCommand(commandToRun, {
+            args,
+            flags: flagsWithDefaults,
+            ...options,
+        });
     }
 }
-
-// Test
-const commandDriver = new CommandDriver();
-
-const lsCommand = new Command({
-    name: "ls",
-    description: "List directory contents",
-    flags: [
-        {
-            names: ["all", "a"],
-            description: "List all entries including those starting with a dot",
-            defaultValue: false,
-        } as CommandFlag<"all", boolean>,
-    ] satisfies CommandFlag[],
-    onCommand: (args, flags): void => {
-        // console.log("args", args);
-        // console.log("flags", flags);
-        log("args:", LogLevel.Info, args);
-        log("flags:", LogLevel.Info, flags);
-    },
-});
-commandDriver.addCommand(lsCommand);
-
-commandDriver.runCommandString("ls arg1 --all");

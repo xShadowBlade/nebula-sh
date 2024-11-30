@@ -1,6 +1,8 @@
 /**
  * @file Handles the commands for the terminal.
  */
+import type { Computer } from "../../computer/computer";
+import type { Directory } from "../../filesystem/directory";
 
 /**
  * The possible flag types.
@@ -74,6 +76,36 @@ export type ObjectFromEntries<T extends [string, unknown][]> = {
 // type MyFlagKeys = GetFlagRecord<MyFlags>; // { help: boolean, version: string }
 
 /**
+ * The function called when a command is executed
+ */
+export type OnCommand<TFlags extends CommandFlag[] = CommandFlag[]> = (options: {
+    /**
+     * The command arguments.
+     * @example ["arg1", "arg2"]
+     */
+    args: string[];
+
+    /**
+     * The command flags.
+     * @example { help: true, version: "1.0.0" }
+     */
+    flags: GetFlagRecord<TFlags>;
+
+    /**
+     * The computer instance.
+     */
+    computer: Computer;
+
+    /**
+     * The current directory.
+     */
+    currentWorkingDirectory: Directory;
+
+    // TODO: Add support for async functions
+// TODO: Add support for return values
+}) => void;
+
+/**
  * The options for the command constructor.
  * See {@link Command}.
  */
@@ -81,7 +113,7 @@ export interface CommandConstructorOptions<TFlags extends CommandFlag[]> {
     name: string;
     description: string;
     flags: TFlags;
-    onCommand: (args: string[], flags: GetFlagRecord<TFlags>) => void;
+    onCommand: OnCommand<TFlags>;
 }
 
 /**
@@ -115,7 +147,7 @@ export class Command<TFlags extends CommandFlag[] = CommandFlag[]> {
      * @param args - The command arguments.
      * @param flags - The command flags.
      */
-    public onCommand: (args: string[], flags: GetFlagRecord<TFlags>) => void;
+    public onCommand: OnCommand<TFlags>;
 
     /**
      * Gets the default flags.
