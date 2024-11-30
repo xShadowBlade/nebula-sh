@@ -24,9 +24,9 @@ export interface FileParts {
 /**
  * Represents file options.
  */
-interface FileOptions {
-    name: string;
-    content: string;
+export interface FileOptions {
+    name?: string;
+    content?: string;
     parent?: Directory | null;
 }
 
@@ -70,11 +70,11 @@ export class File {
      * Constructs a new file.
      * @param options - The file options. See {@link FileOptions}.
      */
-    public constructor(options: FileOptions) {
+    public constructor(options: FileOptions = {}) {
         const { name, content, parent } = options;
 
-        this.name = name;
-        this.content = content;
+        this.name = name ?? "";
+        this.content = content ?? "";
         this.parent = parent || null;
     }
 
@@ -95,10 +95,23 @@ export class File {
      * @returns The compressed content.
      */
     public toString(): string {
-        return compressToBase64(JSON.stringify({
-            name: this.name,
-            content: this.content,
-        }));
+        return compressToBase64(
+            JSON.stringify({
+                name: this.name,
+                content: this.content,
+            }),
+        );
+    }
+
+    /**
+     * Decompresses the file's content from a base64 string.
+     * Overwrites the file's name and content.
+     * @param data - The compressed content.
+     */
+    public fromString(data: string): void {
+        const { name, content } = JSON.parse(decompressFromBase64(data) ?? "{}");
+        this.name = name;
+        this.content = content;
     }
 }
 

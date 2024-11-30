@@ -8,7 +8,7 @@ import { log, LogLevel } from "../terminal/utils/log";
 /**
  * Manages the filesystem.
  */
-class Filesystem {
+export class Filesystem {
     /**
      * The root directory.
      */
@@ -19,11 +19,11 @@ class Filesystem {
      * @param path - The path to separate.
      * @returns The path parts.
      * @example getPathParts("/folder/file.txt") // ["/", "folder", "file.txt"]
-     * @example getPathParts("folder/file.txt") // ["folder", "file.txt"]
+     * @example getPathParts("folder/file.txt") // [".", "folder", "file.txt"]
      * @example getPathParts("../folder/file.txt") // [".", ".", "folder", "file.txt"]
      * @example getPathParts("../../folder/file.txt") // [".", ".", ".", "folder", "file.txt"]
      */
-    public static getPathParts(path: string): string[] {
+    public static getPathParts(path: string): [start: "." | "/", ...parts: string[]] {
         // Split the path into parts
         const parts = path.split("/").filter((part) => part !== "");
 
@@ -35,38 +35,53 @@ class Filesystem {
             parts.unshift(".");
         }
 
-        return parts;
+        // Parse ".." and "."
+        if (parts.length === 1) return parts as ["." | "/"];
+
+        // If the first ".." is found, make it ".", "."
+        if (parts[1] === "..") {
+            parts.splice(1, 1, ".");
+        }
+
+        // For each part, check if it is ".." or "."
+        for (let i = 2; i < parts.length; i++) {
+            // If the part is "..", make it "."
+            if (parts[i] === "..") {
+                parts[i] = ".";
+            } else if (parts[i] === ".") {
+                // If the part is ".", remove it
+                parts.splice(i, 1);
+                i--;
+            }
+        }
+
+        return parts as ["." | "/", ...string[]];
     }
 
     /**
      * Gets a directory by path.
-     * @param path - The directory path.
+     * @deprecated Use {@link getDirectory} in {@link Filesystem.root} instead.
+     * @param pathOrParts - The path or path parts.
      * @returns The directory, if found.
      */
-    public getDirectory(path: string): Directory | undefined {
-        // Special case: if the path is "/", return the root directory
-        if (path === "/" || path === "") return this.root;
-
+    public getDirectory(pathOrParts: string | string[]): Directory | undefined {
         // Split the path into parts
-        const parts = Filesystem.getPathParts(path);
+        const parts = typeof pathOrParts === "string" ? Filesystem.getPathParts(pathOrParts) : pathOrParts;
 
-        let currentDirectory = this.root;
-
-        // For each part, find the directory
-        for (const part of parts) {
-            // Check if the current directory has the part
-            const directory = currentDirectory.contents.find(
-                (content): content is Directory => content instanceof Directory && content.name === part,
-            );
-
-            // If the directory is not found, return undefined
-            if (!directory) return undefined;
-
-            // Set the current directory to the found directory
-            currentDirectory = directory;
+        // If the first part is not "/", log an error
+        if (parts[0] !== "/") {
+            log(`Path "${pathOrParts}" must be absolute`, LogLevel.Error);
+            return;
         }
 
-        return currentDirectory;
+        // Change the first part to "." (root)
+        parts[0] = ".";
+
+        // Debug: log parts
+        log("getDirectory parts:", LogLevel.Debug, parts);
+
+        // Get the directory
+        return this.root.getDirectory(parts);
     }
 
     /**
@@ -81,13 +96,9 @@ class Filesystem {
         const parts = Filesystem.getPathParts(path);
 
         // Get the parent directory
-        const parentDirectory = this.getDirectory(parts.slice(0, -1).join("/"));
+        const parentDirectory = this.getDirectory(parts.slice(0, -1));
 
         // debug: log parent directory and parts
-        // console.log({
-        //     parentDirectory,
-        //     parts,
-        // });
         log("makeDirectory:", LogLevel.Debug, {
             parentDirectory,
             parts,
@@ -110,25 +121,3 @@ class Filesystem {
         parentDirectory.contents.push(newDirectory);
     }
 }
-
-// Test
-const filesystem = new Filesystem();
-
-// log("path parts:", LogLevel.Info, Filesystem.getPathParts("/folder/file.txt"));
-// [
-//     "/folder/file.txt",
-//     "folder/file.txt",
-//     "../folder/file.txt",
-//     "../../folder/file.txt",
-//     "/",
-// ].forEach((path) => {
-//     log(`path parts of "${path}":`, LogLevel.Info, Filesystem.getPathParts(path));
-// });
-
-// filesystem.makeDirectory("/folder");
-// filesystem.makeDirectory("/folder/subfolder");
-// console.log(filesystem.root.contents);
-// console.log(filesystem.getDirectory("/folder"));
-
-// log("fs contents:", LogLevel.Info, filesystem.root.contents);
-// log("get directory:", LogLevel.Info, filesystem.getDirectory("/folder"));

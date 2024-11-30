@@ -1,6 +1,7 @@
 /**
  * @file Declares the directory class.
  */
+import { Filesystem } from "./filesystem";
 
 /**
  * The possible contents of a directory.
@@ -54,11 +55,57 @@ export class Directory {
     }
 
     /**
+     * Gets a file (only if it is in the current directory).
+     * @param name - The file name.
+     * @returns The file, if found.
+     * @example directory.getFileInDirectory("file.txt") // File { name: "file.txt", ... }
+     */
+    public getFileInDirectory(name: string): File | undefined {
+        return this.contents.find((content): content is File => content instanceof File && content.name === name);
+    }
+
+    /**
      * Gets a directory or file by path.
-     * @param path - The directory path.
+     * @param pathOrParts - The path or path parts. (e.g. "./folder/file.txt" or [".", "folder", "file.txt"])
      * @returns The directory, if found.
      */
-    // public getDirectory(path: string): Directory | undefined {
-    //     return this.getDirectoryContent(path, true);
-    // }
+    public getDirectory(pathOrParts: string | string[]): Directory | undefined {
+        const pathParts = typeof pathOrParts === "string" ? Filesystem.getPathParts(pathOrParts) : pathOrParts;
+
+        // If the path is absolute, throw an error
+        if (pathParts[0] !== ".") {
+            throw new Error(`Path "${pathOrParts}" must be relative`);
+        }
+
+        /**
+         * The current directory, used to traverse the path.
+         */
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        let currentDirectory: Directory | undefined = this;
+
+        for (let i = 1; i < pathParts.length; i++) {
+            const part = pathParts[i];
+
+            // If the current directory is undefined, return undefined
+            if (!currentDirectory) return undefined;
+
+            // If the part is ".", go to the parent directory
+            if (part === ".") {
+                currentDirectory = currentDirectory.parent ?? undefined;
+                continue;
+            }
+
+            // Find the directory in the current directory
+            const directory = currentDirectory.contents.find(
+                (content): content is Directory => content instanceof Directory && content.name === part,
+            );
+
+            if (!directory) return undefined;
+
+            // Update the current directory
+            currentDirectory = directory;
+        }
+
+        return currentDirectory;
+    }
 }
