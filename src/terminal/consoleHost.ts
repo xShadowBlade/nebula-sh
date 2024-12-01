@@ -96,19 +96,28 @@ export class ConsoleHost {
     }
 
     /**
+     * Gets the prompt for the console.
+     * @returns The prompt.
+     * @example "nebula-sh root:/home$ " // also with colors
+     */
+    public getPrompt(): string {
+        return (
+            `${ConsoleColors.fg.magenta}${ConsoleColors.dim}nebula-sh${ConsoleColors.reset} ` +
+            `${ConsoleColors.fg.green}${this.currentUser.name}${ConsoleColors.reset}:` +
+            `${ConsoleColors.fg.blue}${this.currentWorkingDirectory.path || "/"}${ConsoleColors.reset}$ `
+        );
+    }
+
+    /**
      * Runs a command.
      * @param command - The command to run.
      * @param options - The command options.
+     * @param logPrompt - Whether to log the prompt.
      */
-    public runCommand(command: string, options?: Parameters<CommandDriver["runCommandString"]>[2]): void {
+    public runCommand(command: string, options?: Parameters<CommandDriver["runCommandString"]>[2], logPrompt = true): void {
         // TODO: Switch to xterm.js
         // log(this.currentWorkingDirectory.path || "/", LogLevel.Shell, command);
-        console.log(
-            `${ConsoleColors.fg.magenta}${ConsoleColors.dim}nebula-sh${ConsoleColors.reset} ` +
-                `${ConsoleColors.fg.green}${this.currentUser.name}${ConsoleColors.reset}:` +
-                `${ConsoleColors.fg.blue}${this.currentWorkingDirectory.path || "/"}${ConsoleColors.reset}$ ` +
-                `${command}`,
-        );
+        if (logPrompt) console.log(this.getPrompt() + command);
 
         // If the command is empty, return
         if (command === "") return;
