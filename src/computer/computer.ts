@@ -19,6 +19,7 @@ import { helpCommand } from "../terminal/commands/help";
 import { listUsersCommand, whoamiCommand } from "../terminal/commands/user/whoami";
 import { userAddCommand } from "../terminal/commands/user/useradd";
 import { suCommand } from "../terminal/commands/user/su";
+import { clearCommand, historyCommand } from "../terminal/commands/history";
 
 /**
  * The computer class.
@@ -61,6 +62,8 @@ const computer = new Computer();
     userAddCommand,
     listUsersCommand,
     suCommand,
+    historyCommand,
+    clearCommand,
     helpCommand,
 ].forEach((command) => {
     computer.commandDriver.addCommand(command);
@@ -103,6 +106,11 @@ const computer = new Computer();
     "ls -r",
     "cd /folder",
     "ls -r",
+
+    "history",
+    // "clear",
+
+    "",
 ].forEach((command) => {
     computer.consoleHost.runCommand(command);
 });

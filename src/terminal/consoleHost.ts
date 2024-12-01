@@ -44,6 +44,11 @@ export class ConsoleHost {
     public currentPrivilege: Privileges;
 
     /**
+     * The history of commands.
+     */
+    public history: string[] = [];
+
+    /**
      * A list of users.
      */
     public users: User[];
@@ -108,6 +113,10 @@ export class ConsoleHost {
         // If the command is empty, return
         if (command === "") return;
 
+        // Run the command
         this.commandDriver.runCommandString(command, this, options);
+
+        // Add the command to the history
+        this.history.push(command);
     }
 }
