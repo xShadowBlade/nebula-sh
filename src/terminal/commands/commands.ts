@@ -212,19 +212,6 @@ export class Command<
     public onCommand: OnCommand<TArgs, TFlags>;
 
     /**
-     * Gets the default flags.
-     * @returns The default flags.
-     */
-    public getDefaultFlags(): GetFlagRecord<TFlags> {
-        return Object.fromEntries(
-            this.flags.map(({ names, defaultValue }) => {
-                const primaryName = Array.isArray(names) ? names[0] : names;
-                return [primaryName, defaultValue];
-            }),
-        ) as GetFlagRecord<TFlags>;
-    }
-
-    /**
      * Constructs a new command.
      * @param options - The command options.
      */
@@ -240,5 +227,52 @@ export class Command<
         this.arguments = options.arguments ?? ([] as unknown as TArgs);
 
         this.privilege = privilege ?? Privileges.User;
+    }
+
+    /**
+     * Gets the default flags.
+     * @returns The default flags.
+     */
+    public getDefaultFlags(): GetFlagRecord<TFlags> {
+        return Object.fromEntries(
+            this.flags.map(({ names, defaultValue }) => {
+                const primaryName = Array.isArray(names) ? names[0] : names;
+                return [primaryName, defaultValue];
+            }),
+        ) as GetFlagRecord<TFlags>;
+    }
+
+    /**
+     * Gets the help text for the command.
+     * @returns The help text.
+     */
+    public getHelpText(): string {
+        const flagsText = this.flags
+            .map(({ names, description, defaultValue }) => {
+                const primaryName = Array.isArray(names) ? names[0] : names;
+                const aliasNames = Array.isArray(names) ? names.slice(1) : [];
+                return (
+                    `--${primaryName}` +
+                    aliasNames.map((aliasName) => `, ${aliasName.length === 1 ? "-" : "--"}${aliasName}`).join("") +
+                    (aliasNames.length !== 0 ? " " : "") +
+                    `(${typeof defaultValue}) - ${description}`
+                );
+            })
+            .join("\n");
+
+        const argumentsText = this.arguments
+            .map(({ names, description, defaultValue, required }, index) => {
+                const primaryName = Array.isArray(names) ? names[0] : names;
+                return `[${index}] ${primaryName} (${typeof defaultValue}) - ${description} ${
+                    required ? "(required)" : "(optional)"
+                }`;
+            })
+            .join("\n");
+
+        return (
+            `${this.name} - ${this.description}` +
+            (flagsText ? `\n\nFlags:\n${flagsText}` : "") +
+            (argumentsText ? `\n\nArguments:\n${argumentsText}` : "")
+        );
     }
 }

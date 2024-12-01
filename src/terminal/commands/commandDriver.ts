@@ -44,7 +44,7 @@ export class CommandDriver {
     /**
      * A list of commands.
      */
-    private commands: Command[] = [];
+    public commands: Command[] = [];
 
     /**
      * Constructs a new command driver.
