@@ -3,11 +3,9 @@
  */
 import type { CommandDriver } from "./commands/commandDriver";
 import type { Computer } from "../computer/computer";
-// import { log, LogLevel } from "./utils/log";
-// import { Command } from "./commands/commands";
 import type { Directory } from "../filesystem/directory";
 import { Privileges } from "../computer/privileges";
-import { ConsoleColors, log, LogLevel } from "./utils/log";
+import { ConsoleColors } from "./utils/log";
 import { User } from "../computer/user";
 
 /**
@@ -43,17 +41,38 @@ export class ConsoleHost {
     /**
      * The current privilege level.
      */
-    public currentPrivilege: Privileges = Privileges.User;
+    public currentPrivilege: Privileges;
 
     /**
      * A list of users.
      */
     public users: User[];
 
+    private _currentUser: User;
+
     /**
-     * The current user.
+     * @returns The current user.
      */
-    public currentUser: User;
+    public get currentUser(): User {
+        return this._currentUser;
+    }
+
+    /**
+     * Sets the current user.
+     */
+    public set currentUser(user: User) {
+        this._currentUser = user;
+        this.currentPrivilege = user.privileges;
+    }
+
+    /**
+     * Gets a user by name.
+     * @param name - The user's name.
+     * @returns The user, if found.
+     */
+    public getUser(name: string): User | undefined {
+        return this.users.find((user) => user.name === name);
+    }
 
     /**
      * Constructs a new console host.
@@ -63,8 +82,9 @@ export class ConsoleHost {
         this.computer = options.computer;
         this.commandDriver = options.commandDriver;
 
-        this.users = options.users ?? [];
-        this.currentUser = options.currentUser ?? new User({ name: "root", privileges: Privileges.Admin });
+        this._currentUser = options.currentUser ?? new User({ name: "root", privileges: Privileges.Admin });
+        this.users = options.users ?? [this.currentUser];
+        this.currentPrivilege = this.currentUser.privileges;
 
         // Set the current working directory to the root
         this.currentWorkingDirectory = this.computer.filesystem.root;

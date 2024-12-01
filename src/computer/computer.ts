@@ -16,6 +16,9 @@ import { lsCommand } from "../terminal/commands/file/ls";
 import { mkdirCommand, touchCommand } from "../terminal/commands/file/makeDirectoryContent";
 import { cdCommand, pwdCommand } from "../terminal/commands/dir/cd";
 import { helpCommand } from "../terminal/commands/help";
+import { listUsersCommand, whoamiCommand } from "../terminal/commands/user/whoami";
+import { userAddCommand } from "../terminal/commands/user/useradd";
+import { suCommand } from "../terminal/commands/user/su";
 
 /**
  * The computer class.
@@ -48,7 +51,18 @@ export class Computer {
 const computer = new Computer();
 
 // Add the built-in commands
-[lsCommand, mkdirCommand, touchCommand, cdCommand, pwdCommand, helpCommand].forEach((command) => {
+[
+    lsCommand,
+    mkdirCommand,
+    touchCommand,
+    cdCommand,
+    pwdCommand,
+    whoamiCommand,
+    userAddCommand,
+    listUsersCommand,
+    suCommand,
+    helpCommand,
+].forEach((command) => {
     computer.commandDriver.addCommand(command);
 });
 
@@ -68,6 +82,10 @@ const computer = new Computer();
 // Run some commands
 // computer.consoleHost.runCommand("help -a");
 [
+    "whoami",
+    "useradd test",
+    "listusers",
+    "su test",
     "mkdir folder",
     // "touch /folder/file.txt",
     // "mkdir /folder/subfolder",
