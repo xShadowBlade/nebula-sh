@@ -187,10 +187,16 @@ export class CommandDriver {
         const flagsWithDefaults = Object.assign({}, commandToRun.getDefaultFlags(), flagsProcessed);
 
         // Process the arguments
-        commandToRun.arguments.forEach((argument, index) => {
+        // commandToRun.arguments.forEach((argument, index) => {
+        for (let index = 0; index < commandToRun.arguments.length; index++) {
+            const argument = commandToRun.arguments[index];
+
             // If the argument is required and not provided, log an error
             if (argument.required && !args[index]) {
-                log(`Argument "${argument.names}" is required`, LogLevel.Error);
+                log(
+                    `Argument "${typeof argument.names === "string" ? argument.names : argument.names[0]}" is required`,
+                    LogLevel.Error,
+                );
                 return;
             }
 
@@ -198,7 +204,7 @@ export class CommandDriver {
             if (!args[index]) {
                 args[index] = argument.defaultValue;
             }
-        });
+        };
 
         // Run the command
         this.runCommand(commandToRun, consoleHost, {

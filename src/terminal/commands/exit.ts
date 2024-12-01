@@ -2,7 +2,6 @@
  * @file Declares the exit command.
  */
 import { Command } from "./commands";
-import { log, LogLevel } from "../utils/log";
 
 export const exitCommand = new Command({
     name: "exit",

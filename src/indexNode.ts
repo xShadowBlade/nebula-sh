@@ -18,7 +18,7 @@ process.on("SIGINT", () => {
 });
 
 // Start the loop
-(async () => {
+(async (): Promise<void> => {
     console.clear();
 
     while (true) {
