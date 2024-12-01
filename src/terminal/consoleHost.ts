@@ -7,7 +7,18 @@ import type { Computer } from "../computer/computer";
 // import { Command } from "./commands/commands";
 import type { Directory } from "../filesystem/directory";
 import { Privileges } from "../computer/privileges";
-import { log, LogLevel } from "./utils/log";
+import { ConsoleColors, log, LogLevel } from "./utils/log";
+import { User } from "../computer/user";
+
+/**
+ * The console host options.
+ */
+export interface ConsoleHostOptions {
+    computer: Computer;
+    commandDriver: CommandDriver;
+    users?: User[];
+    currentUser?: User;
+}
 
 /**
  * The console host.
@@ -35,16 +46,28 @@ export class ConsoleHost {
     public currentPrivilege: Privileges = Privileges.User;
 
     /**
-     * Constructs a new console host.
-     * @param computer - The computer instance.
-     * @param commandDriver - The command driver.
+     * A list of users.
      */
-    public constructor(computer: Computer, commandDriver: CommandDriver) {
-        this.computer = computer;
-        this.commandDriver = commandDriver;
+    public users: User[];
+
+    /**
+     * The current user.
+     */
+    public currentUser: User;
+
+    /**
+     * Constructs a new console host.
+     * @param options - The console host options.
+     */
+    public constructor(options: ConsoleHostOptions) {
+        this.computer = options.computer;
+        this.commandDriver = options.commandDriver;
+
+        this.users = options.users ?? [];
+        this.currentUser = options.currentUser ?? new User({ name: "root", privileges: Privileges.Admin });
 
         // Set the current working directory to the root
-        this.currentWorkingDirectory = computer.filesystem.root;
+        this.currentWorkingDirectory = this.computer.filesystem.root;
     }
 
     /**
@@ -54,7 +77,13 @@ export class ConsoleHost {
      */
     public runCommand(command: string, options?: Parameters<CommandDriver["runCommandString"]>[2]): void {
         // TODO: Switch to xterm.js
-        log(this.currentWorkingDirectory.path || "/", LogLevel.Shell, command);
+        // log(this.currentWorkingDirectory.path || "/", LogLevel.Shell, command);
+        console.log(
+            `${ConsoleColors.fg.magenta}${ConsoleColors.dim}nebula-sh${ConsoleColors.reset} ` +
+                `${ConsoleColors.fg.green}${this.currentUser.name}${ConsoleColors.reset}:` +
+                `${ConsoleColors.fg.blue}${this.currentWorkingDirectory.path || "/"}${ConsoleColors.reset}$ ` +
+                `${command}`,
+        );
 
         // If the command is empty, return
         if (command === "") return;

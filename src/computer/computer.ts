@@ -37,7 +37,10 @@ export class Computer {
      * The console host.
      * See {@link ConsoleHost}
      */
-    public consoleHost = new ConsoleHost(this, this.commandDriver);
+    public consoleHost = new ConsoleHost({
+        computer: this,
+        commandDriver: this.commandDriver,
+    });
 }
 
 // TODO: Move these tests to an actual test file
