@@ -14,6 +14,7 @@ import { userAddCommand } from "../terminal/commands/user/useradd";
 import { suCommand } from "../terminal/commands/user/su";
 import { clearCommand, historyCommand } from "../terminal/commands/history";
 import { exitCommand } from "../terminal/commands/exit";
+import { rmCommand } from "../terminal/commands/file/rm";
 
 /**
  * The computer class.
@@ -60,6 +61,7 @@ export const defaultComputer = new Computer();
     historyCommand,
     clearCommand,
     exitCommand,
+    rmCommand,
     helpCommand,
 ].forEach((command) => {
     defaultComputer.commandDriver.addCommand(command);
@@ -74,9 +76,6 @@ export const defaultComputer = new Computer();
 //     "listusers",
 //     "su test",
 //     "mkdir folder",
-//     // "touch /folder/file.txt",
-//     // "mkdir /folder/subfolder",
-//     // "touch /folder/subfolder/file2.txt",
 //     "cd ./folder",
 //     "pwd",
 //     "touch file.txt",
@@ -88,10 +87,11 @@ export const defaultComputer = new Computer();
 //     "pwd",
 
 //     "ls -r",
-//     "cd /folder",
+//     // "cd /folder",
+//     "rm -r ./folder/subfolder",
 //     "ls -r",
 
-//     "history",
+//     // "history",
 //     // "clear",
 
 //     "",

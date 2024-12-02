@@ -89,6 +89,17 @@ export class Directory {
     }
 
     /**
+     * Gets a directory (only if it is in the current directory).
+     * @deprecated
+     * @param name - The directory name.
+     * @returns The directory, if found.
+     * @example directory.getDirectoryInDirectory("folder") // Directory { name: "folder", ... }
+     */
+    public getDirectoryInDirectory(name: string): Directory | undefined {
+        return this.contents.find((content): content is Directory => content instanceof Directory && content.name === name);
+    }
+
+    /**
      * Gets a directory or file by path.
      * @param pathOrParts - The path or path parts. (e.g. "./folder/file.txt" or [".", "folder", "file.txt"])
      * @returns The directory, if found.
@@ -234,5 +245,91 @@ export class Directory {
 
         // Add the new file to the parent directory
         parentDirectory.addContent(fileToAdd);
+    }
+
+    /**
+     * Removes a file.
+     * @param pathOrParts - The file path.
+     * @example
+     * removeFile("/folder/file.txt") // Removes the file named "file.txt" from the "folder" directory
+     */
+    // TODO: garbage collect empty directories
+    public removeFile(pathOrParts: string | string[]): void {
+        // Get the file
+        const file = this.getFile(pathOrParts);
+
+        // If the file is not found, log an error
+        if (!file) {
+            log(
+                `File "${typeof pathOrParts === "string" ? pathOrParts : Filesystem.partsToPath(pathOrParts)}" not found`,
+                LogLevel.Error,
+            );
+            return;
+        }
+
+        // Get the file's parent directory
+        const parentDirectory = this.getParentDirectoryOfPath(pathOrParts);
+
+        // If the parent directory is not found, log an error
+        if (!parentDirectory) {
+            log(
+                `Directory "${typeof pathOrParts === "string" ? pathOrParts : Filesystem.partsToPath(pathOrParts)}" not found`,
+                LogLevel.Error,
+            );
+            return;
+        }
+
+        // Remove the file from the parent directory
+        for (let i = 0; i < parentDirectory.contents.length; i++) {
+            if (parentDirectory.contents[i] === file) {
+                parentDirectory.contents.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Removes this directory.
+     */
+    public removeThisDirectory(): void {
+        // Get the parent directory
+        const parentDirectory = this.parent;
+
+        // If the parent directory is not found, log an error
+        if (!parentDirectory) {
+            log(`Parent directory not found`, LogLevel.Error);
+            return;
+        }
+
+        // Remove the directory from the parent directory
+        for (let i = 0; i < parentDirectory.contents.length; i++) {
+            if (parentDirectory.contents[i] === this) {
+                parentDirectory.contents.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Removes a directory.
+     * @param pathOrParts - The directory path.
+     * @example
+     * removeDirectory("/folder") // Removes the "folder" directory
+     */
+    public removeDirectory(pathOrParts: string | string[]): void {
+        // Get the directory
+        const directory = this.getDirectory(pathOrParts);
+
+        // If the directory is not found, log an error
+        if (!directory) {
+            log(
+                `Directory "${typeof pathOrParts === "string" ? pathOrParts : Filesystem.partsToPath(pathOrParts)}" not found`,
+                LogLevel.Error,
+            );
+            return;
+        }
+
+        // Remove the directory
+        directory.removeThisDirectory();
     }
 }
