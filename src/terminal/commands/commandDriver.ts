@@ -17,12 +17,37 @@ export class CommandDriver {
      * - Match 2: The flag value.
      *
      * Supported formats:
-     * @example "--flag"
-     * @example "--flag=value"
-     * @example "--flag:value"
-     * @example "-f"
+     * @example "--flag" // ["flag", undefined]
+     * @example "--flag=value" // ["flag", "value"]
+     * @example "--flag:value" // ["flag", "value"]
+     * @example "-f" // ["f", undefined]
      */
     private static flagRegex = /^--?([a-zA-Z0-9-]+)(?:[=:](.*))?$/;
+
+    /**
+     * A regex to match quotes.
+     * - Match 1: The quoted string.
+     * @example `"quoted string"` // [`"quoted string"`]
+     * @example `filler "quoted string" "another quoted string"` // [`"quoted string"`, `"another quoted string"`]
+     */
+    // TODO: Make quotes actually match (ex. "asd' matches when it shouldn't)
+    private static quoteRegex = /("|'[^"]*"|')/g;
+
+    /**
+     * A list of temporary characters that are replaced in the command string BEFORE parsing.
+     * @example " " -> "\\SPACE"
+     */
+    private static temporaryCharacterToReplaced = {
+        " ": "\\SPACE",
+    };
+
+    /**
+     * A list of temporary characters that are replaced in the command string AFTER parsing.
+     * @example "\\SPACE" -> " "
+     */
+    private static temporaryReplacedToCharacter = Object.fromEntries(
+        Object.entries(CommandDriver.temporaryCharacterToReplaced).map(([key, value]) => [value, key]),
+    );
 
     /**
      * Parses a value
@@ -31,7 +56,7 @@ export class CommandDriver {
      */
     private static parseValue(value: string): FlagTypes {
         // TODO: Add support for escaping quotes
-        if (value.includes(`"`)) {
+        if (value.includes(`"`) || value.includes(`'`)) {
             log(`Quotes are not supported in flags: ${value}`, LogLevel.Error);
         }
 
@@ -128,8 +153,59 @@ export class CommandDriver {
         consoleHost: ConsoleHost,
         options?: Parameters<CommandDriver["runCommand"]>[1],
     ): void {
-        // First, split the command string into parts
-        const parts = commandString.split(" ");
+        // Debug: log the command string
+        // log(`Command string: ${commandString}`, LogLevel.Debug);
+
+        // Match quotes
+        const originalQuotes = commandString.match(CommandDriver.quoteRegex);
+
+        // For each quote, replace it with a temporary character
+        const transformedQuotes = originalQuotes?.map((quote) => {
+            // Remove the quotes (1st and last character)
+            quote = quote.slice(1, -1);
+
+            // commandString = commandString.replace(quote, CommandDriver.temporaryReplacedCharacters[" "]);
+
+            // Replace temporary characters
+            // for (const [original, replacement] of Object.entries(CommandDriver.temporaryReplacedCharacters)) {
+            //     commandString = commandString.replaceAll(original, replacement);
+            // }
+
+            // Replace temporary characters
+            for (const [original, replacement] of Object.entries(CommandDriver.temporaryCharacterToReplaced)) {
+                // commandString = commandString.replaceAll(original, replacement);
+                quote = quote.replaceAll(original, replacement);
+            }
+
+            return quote;
+        });
+
+        // Replace the quotes in the original command string
+        transformedQuotes?.forEach((quote, index) => {
+            commandString = commandString.replace(originalQuotes?.[index] as string, quote);
+        });
+
+        // Debug: log the transformed command string
+        // log(`Transformed command string: ${commandString}`, LogLevel.Debug);
+
+        const parts = commandString
+            // Split the command string into parts
+            .split(" ")
+            // Filter out empty parts
+            .filter((part) => part.length > 0);
+
+        // Replace temporary characters
+        parts.forEach((part, index) => {
+            // Debug: log the part
+            // log(`Part: ${part}`, LogLevel.Log);
+
+            for (const [original, replacement] of Object.entries(CommandDriver.temporaryReplacedToCharacter)) {
+                parts[index] = part.replaceAll(original, replacement);
+            }
+        });
+
+        // Debug: log the parts
+        // log(`Parts:`, LogLevel.Debug, parts);
 
         // The first part is the command name
         const name = parts[0];
@@ -204,7 +280,7 @@ export class CommandDriver {
             if (!args[index]) {
                 args[index] = argument.defaultValue;
             }
-        };
+        }
 
         // Run the command
         this.runCommand(commandToRun, consoleHost, {

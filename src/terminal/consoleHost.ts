@@ -5,7 +5,7 @@ import type { CommandDriver } from "./commands/commandDriver";
 import type { Computer } from "../computer/computer";
 import type { Directory } from "../filesystem/directory";
 import { Privileges } from "../computer/privileges";
-import { ConsoleColors } from "./utils/log";
+import { ConsoleColors, log, LogLevel } from "./utils/log";
 import { User } from "../computer/user";
 
 /**
@@ -114,10 +114,17 @@ export class ConsoleHost {
      * @param options - The command options.
      * @param logPrompt - Whether to log the prompt.
      */
-    public runCommand(command: string, options?: Parameters<CommandDriver["runCommandString"]>[2], logPrompt = true): void {
+    public runCommand(
+        command: string,
+        options?: Parameters<CommandDriver["runCommandString"]>[2],
+        logPrompt = true,
+    ): void {
         // TODO: Switch to xterm.js
         // log(this.currentWorkingDirectory.path || "/", LogLevel.Shell, command);
         if (logPrompt) console.log(this.getPrompt() + command);
+
+        // Debug: log command
+        // log(command, LogLevel.Debug);
 
         // If the command is empty, return
         if (command === "") return;
