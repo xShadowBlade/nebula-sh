@@ -10,6 +10,15 @@ import type { Directory } from "../../filesystem/directory";
  */
 export type FlagTypes = boolean | string | number;
 
+export type FlagTypeString = "boolean" | "string" | "number";
+
+// eslint-disable-next-line prettier/prettier
+export type StringToFlagType<T extends FlagTypeString> = 
+    T extends "boolean" ? boolean :
+    T extends "string" ? string :
+    T extends "number" ? number :
+    undefined;
+
 /**
  * The command flag initializer.
  * @example
@@ -19,7 +28,10 @@ export type FlagTypes = boolean | string | number;
  *     defaultValue: false, // The flag default value. Also determines the flag type.
  * };
  */
-export interface CommandFlag<TPrimaryFlagName extends string = string, TFlagType extends FlagTypes = FlagTypes> {
+export interface CommandFlag<
+    TPrimaryFlagName extends string = string,
+    TFlagTypeString extends FlagTypeString = FlagTypeString,
+> {
     /**
      * Any names aliases for the flag, as a string array.
      * - The first index is the primary name.
@@ -28,7 +40,7 @@ export interface CommandFlag<TPrimaryFlagName extends string = string, TFlagType
      * Ex: ls --my-flag=1 --my-flag=2 // my-flag will be 2
      * @example ["help", "h", "?"] // "help" is the primary name, "h" is the 1st alias, and "?" is the 2nd alias
      */
-    names: TPrimaryFlagName | [TPrimaryFlagName, ...string[]];
+    name: TPrimaryFlagName | [TPrimaryFlagName, ...string[]];
 
     /**
      * The flag description.
@@ -37,13 +49,22 @@ export interface CommandFlag<TPrimaryFlagName extends string = string, TFlagType
     description: string;
 
     /**
+     * The flag type.
+     * @default "string"
+     * @example "boolean" // boolean
+     * @example "string" // string
+     * @example "number" // number
+     */
+    type: TFlagTypeString;
+
+    /**
      * The flag default value.
-     * Also determines the flag type.
+     * @default undefined
      * @example false // boolean
      * @example "default" // string
      * @example 0 // number
      */
-    defaultValue: TFlagType;
+    defaultValue?: StringToFlagType<TFlagTypeString>;
 }
 
 /**
@@ -56,10 +77,11 @@ export interface CommandFlag<TPrimaryFlagName extends string = string, TFlagType
  *     required: false,
  * };
  */
-export interface CommandArgument<TFlagType extends FlagTypes = FlagTypes> extends CommandFlag<string, TFlagType> {
+export interface CommandArgument<TFlagTypeString extends FlagTypeString = FlagTypeString>
+    extends CommandFlag<string, TFlagTypeString> {
     /**
      * If the argument is required.
-     * @example true
+     * @default true
      */
     required: boolean;
 }
@@ -235,7 +257,7 @@ export class Command<
      */
     public getDefaultFlags(): GetFlagRecord<TFlags> {
         return Object.fromEntries(
-            this.flags.map(({ names, defaultValue }) => {
+            this.flags.map(({ name: names, defaultValue }) => {
                 const primaryName = Array.isArray(names) ? names[0] : names;
                 return [primaryName, defaultValue];
             }),
@@ -248,7 +270,7 @@ export class Command<
      */
     public getHelpText(): string {
         const flagsText = this.flags
-            .map(({ names, description, defaultValue }) => {
+            .map(({ name: names, description, defaultValue }) => {
                 const primaryName = Array.isArray(names) ? names[0] : names;
                 const aliasNames = Array.isArray(names) ? names.slice(1) : [];
                 return (
@@ -261,7 +283,7 @@ export class Command<
             .join("\n");
 
         const argumentsText = this.arguments
-            .map(({ names, description, defaultValue, required }, index) => {
+            .map(({ name: names, description, defaultValue, required }, index) => {
                 const primaryName = Array.isArray(names) ? names[0] : names;
                 return `[${index}] ${primaryName} (${typeof defaultValue}) - ${description} ${
                     required ? "(required)" : "(optional)"

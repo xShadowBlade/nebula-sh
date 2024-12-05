@@ -247,12 +247,12 @@ export class CommandDriver {
         const flagsProcessed = {} as Record<string, FlagTypes>;
         (commandToRun.flags as CommandFlag[]).forEach((flag) => {
             // Get the primary flag name
-            const primaryFlagName = typeof flag.names === "string" ? flag.names : flag.names[0];
+            const primaryFlagName = typeof flag.name === "string" ? flag.name : flag.name[0];
 
             // For each flag name, check if it is in the flags object
             Object.entries(flagsBeforeProcessed).forEach(([flagName, flagValue]) => {
                 // If the flag name is not in the flag names, skip
-                if (!flag.names.includes(flagName)) return;
+                if (!flag.name.includes(flagName)) return;
 
                 // If the flag name is the primary flag name, add it to the flags object
                 flagsProcessed[primaryFlagName] = flagValue;
@@ -270,7 +270,7 @@ export class CommandDriver {
             // If the argument is required and not provided, log an error
             if (argument.required && !args[index]) {
                 log(
-                    `Argument "${typeof argument.names === "string" ? argument.names : argument.names[0]}" is required`,
+                    `Argument "${typeof argument.name === "string" ? argument.name : argument.name[0]}" is required`,
                     LogLevel.Error,
                 );
                 return;

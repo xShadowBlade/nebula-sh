@@ -16,7 +16,7 @@ export const mkdirCommand = new Command({
     // The arguments for the command
     arguments: [
         {
-            names: "path",
+            name: "path",
             description: "The path to the directory to create",
             defaultValue: "",
             required: true,
@@ -40,7 +40,7 @@ export const touchCommand = new Command({
     // The arguments for the command
     arguments: [
         {
-            names: "path",
+            name: "path",
             description: "The path of the file to create",
             defaultValue: "",
             required: true,
@@ -70,7 +70,7 @@ export const catCommand = new Command({
     // The arguments for the command
     arguments: [
         {
-            names: "path",
+            name: "path",
             description: "The path of the file to read",
             defaultValue: "",
             required: true,

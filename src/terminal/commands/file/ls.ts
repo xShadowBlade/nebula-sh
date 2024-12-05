@@ -58,7 +58,7 @@ export const lsCommand = new Command({
     // The arguments for the command
     arguments: [
         {
-            names: "directory",
+            name: "directory",
             description: "The directory to list",
             defaultValue: ".",
             required: false,
@@ -68,7 +68,7 @@ export const lsCommand = new Command({
     // The flags for the command
     flags: [
         {
-            names: ["recursive", "recurse", "R", "r"],
+            name: ["recursive", "recurse", "R", "r"],
             description: "List subdirectories recursively",
             defaultValue: false,
         } as CommandFlag<"recursive", boolean>,
