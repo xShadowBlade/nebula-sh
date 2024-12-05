@@ -2,6 +2,7 @@
  * @file Declares the filesystem class.
  */
 import { Directory } from "./directory";
+import { getPathParts, partsToPath } from "./path/path";
 import type { File } from "./file";
 import { log, LogLevel } from "../terminal/utils/log";
 
@@ -11,6 +12,7 @@ import { log, LogLevel } from "../terminal/utils/log";
 export class Filesystem {
     /**
      * Separates a path into parts.
+     * @deprecated Use {@link getPathParts} instead.
      * @param path - The path to separate.
      * @returns The path parts.
      * @example getPathParts("/folder/file.txt") // ["/", "folder", "file.txt"]
@@ -19,63 +21,18 @@ export class Filesystem {
      * @example getPathParts("../../folder/file.txt") // [".", ".", ".", "folder", "file.txt"]
      */
     public static getPathParts(path: string): [start: "." | "/", ...parts: string[]] {
-        // Split the path into parts
-        const parts = path.split("/").filter((part) => part !== "");
-
-        // If the path is empty, return "."
-        if (parts.length === 1 && (parts[0] === "." || parts[0] === "/")) {
-            return parts as ["." | "/"];
-        }
-
-        // If the path is absolute, add a leading slash
-        if (path.startsWith("/")) {
-            parts.unshift("/");
-        } else {
-            // If the path is relative, add a leading dot
-            parts.unshift(".");
-        }
-
-        // If the first part is "./", remove it
-        if (parts[1] === ".") {
-            parts.splice(1, 1);
-        }
-
-        // If the first ".." is found, make it ".", "."
-        if (parts[1] === "..") {
-            parts.splice(1, 1, ".");
-        }
-
-        // For each part, check if it is ".." or "."
-        for (let i = 2; i < parts.length; i++) {
-            // If the part is "..", make it "."
-            if (parts[i] === "..") {
-                parts[i] = ".";
-            } else if (parts[i] === ".") {
-                // If the part is ".", remove it
-                parts.splice(i, 1);
-                i--;
-            }
-        }
-
-        return parts as ["." | "/", ...string[]];
+        return getPathParts(path);
     }
 
     /**
      * Converts path parts to a path.
+     * @deprecated Use {@link partsToPath} instead.
      * @param parts - The path parts.
      * @returns The path.
      * @example partsToPath(["/", "folder", "file.txt"]) // "/folder/file.txt"
      */
     public static partsToPath(parts: string[]): string {
-        // If there are two "."s in a row, combine them
-        for (let i = 1; i < parts.length; i++) {
-            if (parts[i] === "." && parts[i - 1] === ".") {
-                parts.splice(i - 1, 2, "..");
-                i--;
-            }
-        }
-
-        return parts.join("/");
+        return partsToPath(parts);
     }
 
     /**
