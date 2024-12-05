@@ -11,7 +11,7 @@ export const suCommand = new Command({
     // The arguments for the command
     arguments: [
         {
-            names: "user",
+            name: "user",
             description: "The user to switch to",
             defaultValue: "root",
             required: false,

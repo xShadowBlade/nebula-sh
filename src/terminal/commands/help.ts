@@ -12,7 +12,7 @@ export const helpCommand = new Command({
     // The arguments for the command
     arguments: [
         {
-            names: "command",
+            name: "command",
             description: "The command to show help for",
             defaultValue: "",
             required: false,
@@ -22,7 +22,7 @@ export const helpCommand = new Command({
     // The flags for the command
     flags: [
         {
-            names: ["all", "A", "a"],
+            name: ["all", "A", "a"],
             description: "Show help for all commands",
             defaultValue: false,
             required: false,

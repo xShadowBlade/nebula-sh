@@ -14,13 +14,13 @@ export const userAddCommand = new Command({
     // The arguments for the command
     arguments: [
         {
-            names: "name",
+            name: "name",
             description: "The name of the user",
             defaultValue: "root",
             required: true,
         } as CommandArgument<string>,
         {
-            names: "privileges",
+            name: "privileges",
             description: `The privileges of the user (${Object.keys(Privileges).join(", ")})`,
             defaultValue: "User",
             required: false,

@@ -13,7 +13,7 @@ export const cdCommand = new Command({
     // The arguments for the command
     arguments: [
         {
-            names: "path",
+            name: "path",
             description: "The path to change to",
             defaultValue: ".",
             required: true,
