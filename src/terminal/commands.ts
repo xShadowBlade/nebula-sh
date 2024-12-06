@@ -1,9 +1,9 @@
 /**
  * @file Handles the commands for the terminal.
  */
-import type { ConsoleHost } from "../consoleHost";
-import { Privileges } from "../../computer/privileges";
-import type { Directory } from "../../filesystem/directory";
+import type { ConsoleHost } from "./consoleHost";
+import { Privileges } from "../computer/user/privileges";
+import type { Directory } from "../filesystem/directory";
 
 /**
  * The possible flag types.

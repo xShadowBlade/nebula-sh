@@ -1,10 +1,10 @@
 /**
  * @file Declares the console host.
  */
-import type { CommandDriver } from "./commands/commandDriver";
+import type { CommandDriver } from "./commandDriver";
 import type { Computer } from "../computer/computer";
 import type { Directory } from "../filesystem/directory";
-import { Privileges } from "../computer/privileges";
+import { Privileges } from "../computer/user/privileges";
 import { ConsoleColors, log, LogLevel } from "./utils/log";
 import { User } from "../computer/user";
 

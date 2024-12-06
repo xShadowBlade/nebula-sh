@@ -1,11 +1,11 @@
 /**
  * @file Declares the command driver class.
  */
-import { log, LogLevel } from "../utils/log";
+import { log, LogLevel } from "./utils/log";
 import type { Command } from "./commands";
 import type { CommandFlag, FlagTypes, OnCommand } from "./commands";
-import type { ConsoleHost } from "../consoleHost";
-import { checkPrivilege } from "../../computer/privileges";
+import type { ConsoleHost } from "./consoleHost";
+import { checkPrivilege } from "../computer/user/privileges";
 
 /**
  * Wraps a set of commands and runs them.

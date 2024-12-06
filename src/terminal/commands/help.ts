@@ -1,8 +1,8 @@
 /**
  * @file Declares the help command
  */
-import type { CommandArgument } from "./commands";
-import { Command } from "./commands";
+import type { CommandArgument } from "../commands";
+import { Command } from "../commands";
 import { log, LogLevel } from "../utils/log";
 
 export const helpCommand = new Command({
