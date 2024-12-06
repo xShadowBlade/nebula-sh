@@ -2,6 +2,8 @@
  * @file Declares the path utility functions.
  */
 
+import { log, LogLevel } from "../../terminal/utils/log";
+
 /**
  * Separates a path into parts.
  * @param path - The path to separate.
@@ -82,3 +84,42 @@ export function partsToPath(parts: string[]): string {
 export function isAbsolute(path: string): boolean {
     return path.startsWith("/");
 }
+
+/**
+ * Resolves paths.
+ * @param paths - The paths to resolve.
+ * @returns The resolved path.
+ */
+// TODO: fix
+export function resolve(...paths: string[]): string[] {
+    const resolvedPath: string[] = [paths[0]];
+
+    // For each path, resolve it and add it to the resolved path
+    for (let i = 1; i < paths.length; i++) {
+        const path = paths[i];
+
+        if (isAbsolute(path)) {
+            // resolvedPath = path;
+            log("Absolute path not supported:", LogLevel.Error, paths.join(", "));
+            return [""];
+        }
+
+        resolvedPath.push(...getPathParts(path));
+    }
+
+    // Replace /./ with /
+    // resolvedPath = resolvedPath.replace(/\/\.\//g, "/");
+
+    return resolvedPath;
+}
+
+// Test
+[
+    ["/", "folder", "file.txt"], // "/folder/file.txt"
+    ["folder", "file.txt"], // "./folder/file.txt"
+    ["../folder", "file.txt"], // "../folder/file.txt"
+    ["../../folder", "file.txt"], // "../../folder/file.txt"
+].forEach((parts) => {
+    // console.log(partsToPath(parts), resolve(...parts));
+    log("resolve:", LogLevel.Debug, resolve(...parts));
+});

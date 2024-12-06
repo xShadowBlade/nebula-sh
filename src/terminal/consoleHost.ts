@@ -6,7 +6,7 @@ import type { Computer } from "../computer/computer";
 import type { Directory } from "../filesystem/directory";
 import { Privileges } from "../computer/user/privileges";
 import { ConsoleColors, log, LogLevel } from "./utils/log";
-import { User } from "../computer/user";
+import { User } from "../computer/user/user";
 
 /**
  * The console host options.

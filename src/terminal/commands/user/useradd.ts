@@ -5,7 +5,7 @@ import type { CommandArgument } from "../../commands";
 import { Command } from "../../commands";
 import { log, LogLevel } from "../../utils/log";
 import { checkPrivilege, Privileges } from "../../../computer/user/privileges";
-import { User } from "../../../computer/user";
+import { User } from "../../../computer/user/user";
 
 export const userAddCommand = new Command({
     name: "useradd",

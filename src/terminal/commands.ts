@@ -10,6 +10,9 @@ import type { Directory } from "../filesystem/directory";
  */
 export type FlagTypes = boolean | string | number;
 
+/**
+ * Possible flag types as strings.
+ */
 export type FlagTypeString = "boolean" | "string" | "number";
 
 // eslint-disable-next-line prettier/prettier
