@@ -1,10 +1,10 @@
 /**
  * @file Declares a template for a command.
  */
-import type { CommandArgument } from ".././commands";
-import { Command } from ".././commands";
+import type { CommandArgument } from "../../commands";
+import { Command } from "../../commands";
 import { log, LogLevel } from "../../utils/log";
-import { checkPrivilege, Privileges } from "../../../computer/privileges";
+import { checkPrivilege, Privileges } from "../../../computer/user/privileges";
 import { User } from "../../../computer/user";
 
 export const userAddCommand = new Command({

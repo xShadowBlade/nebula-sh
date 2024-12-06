@@ -4,8 +4,8 @@
 import { Directory } from "../../../filesystem/directory";
 import { log, LogLevel } from "../../utils/log";
 
-import { Command } from "../commands";
-import type { CommandFlag, CommandArgument } from "../commands";
+import { Command } from "../../commands";
+import type { CommandFlag, CommandArgument } from "../../commands";
 
 /**
  * The options for {@link logDirectoryContents}.

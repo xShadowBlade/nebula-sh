@@ -1,13 +1,13 @@
 /**
  * @file Declares the computer class
  */
-import { CommandDriver } from "../terminal/commands/commandDriver";
+import { CommandDriver } from "../terminal/commandDriver";
 import { Filesystem } from "../filesystem/filesystem";
 import { ConsoleHost } from "../terminal/consoleHost";
 
 import { lsCommand } from "../terminal/commands/file/ls";
 import { mkdirCommand, touchCommand } from "../terminal/commands/file/makeDirectoryContent";
-import { cdCommand, pwdCommand } from "../terminal/commands/dir/cd";
+import { cdCommand, pwdCommand } from "../terminal/commands/file/cd";
 import { helpCommand } from "../terminal/commands/help";
 import { listUsersCommand, whoamiCommand } from "../terminal/commands/user/whoami";
 import { userAddCommand } from "../terminal/commands/user/useradd";

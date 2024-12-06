@@ -1,7 +1,7 @@
 /**
  * @file Declares the history and clear commands.
  */
-import { Command } from "./commands";
+import { Command } from "../commands";
 import { log, LogLevel } from "../utils/log";
 
 export const historyCommand = new Command({

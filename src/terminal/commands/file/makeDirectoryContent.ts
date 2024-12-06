@@ -1,8 +1,8 @@
 /**
  * @file Declares the mkdir and touch commands.
  */
-import type { CommandArgument, OnCommand } from "../commands";
-import { Command } from "../commands";
+import type { CommandArgument, OnCommand } from "../../commands";
+import { Command } from "../../commands";
 import { Directory } from "../../../filesystem/directory";
 import { File } from "../../../filesystem/file";
 
