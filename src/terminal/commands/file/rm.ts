@@ -16,8 +16,9 @@ export const rmCommand = new Command({
             name: "path",
             description: "The path to the file or directory to remove.",
             defaultValue: "",
+            type: "path",
             required: true,
-        } as CommandArgument<string>,
+        } as CommandArgument<"path">,
     ],
 
     // The flags for the command
@@ -25,19 +26,21 @@ export const rmCommand = new Command({
         {
             name: ["recursive", "r", "R"],
             description: "Recursively remove the file or directory.",
+            type: "boolean",
             defaultValue: false,
-        } as CommandFlag<"recursive", boolean>,
+        } as CommandFlag<"recursive", "boolean">,
         {
             name: ["force", "f"],
             description: "Force the removal of the file or directory.",
+            type: "boolean",
             defaultValue: false,
-        } as CommandFlag<"force", boolean>,
+        } as CommandFlag<"force", "boolean">,
         // (not because I am too lazy to implement multiple flags in a single space)
         {
             name: "rf",
             description: "Recursively and forcefully remove the file or directory.",
             defaultValue: false,
-        } as CommandFlag<"rf", boolean>,
+        } as CommandFlag<"rf", "boolean">,
     ] as const,
 
     // The function to run when the command is called

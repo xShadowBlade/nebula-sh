@@ -16,15 +16,17 @@ export const userAddCommand = new Command({
         {
             name: "name",
             description: "The name of the user",
+            type: "string",
             defaultValue: "root",
             required: true,
-        } as CommandArgument<string>,
+        } as CommandArgument<"string">,
         {
             name: "privileges",
             description: `The privileges of the user (${Object.keys(Privileges).join(", ")})`,
+            type: "string",
             defaultValue: "User",
             required: false,
-        } as CommandArgument<string>,
+        } as CommandArgument<"string">,
     ],
 
     // The flags for the command

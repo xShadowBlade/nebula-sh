@@ -1,7 +1,7 @@
 /**
  * @file Declares the help command
  */
-import type { CommandArgument } from "../commands";
+import type { CommandArgument, CommandFlag } from "../commands";
 import { Command } from "../commands";
 import { log, LogLevel } from "../utils/log";
 
@@ -14,9 +14,10 @@ export const helpCommand = new Command({
         {
             name: "command",
             description: "The command to show help for",
+            type: "string",
             defaultValue: "",
             required: false,
-        } as CommandArgument<string>,
+        } as CommandArgument<"string">,
     ],
 
     // The flags for the command
@@ -24,9 +25,10 @@ export const helpCommand = new Command({
         {
             name: ["all", "A", "a"],
             description: "Show help for all commands",
+            type: "boolean",
             defaultValue: false,
             required: false,
-        }
+        } as CommandFlag<"all", "boolean">,
     ],
 
     // The function to run when the command is called
