@@ -15,6 +15,7 @@ export const cdCommand = new Command({
         {
             name: "path",
             description: "The path to change to",
+            type: "string",
             defaultValue: ".",
             required: true,
         },

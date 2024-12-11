@@ -87,6 +87,7 @@ export function isAbsolute(path: string): boolean {
 
 /**
  * Resolves paths.
+ * @deprecated
  * @param paths - The paths to resolve.
  * @returns The resolved path.
  */
@@ -114,12 +115,12 @@ export function resolve(...paths: string[]): string[] {
 }
 
 // Test
-[
-    ["/", "folder", "file.txt"], // "/folder/file.txt"
-    ["folder", "file.txt"], // "./folder/file.txt"
-    ["../folder", "file.txt"], // "../folder/file.txt"
-    ["../../folder", "file.txt"], // "../../folder/file.txt"
-].forEach((parts) => {
-    // console.log(partsToPath(parts), resolve(...parts));
-    log("resolve:", LogLevel.Debug, resolve(...parts));
-});
+// [
+//     ["/", "folder", "file.txt"], // "/folder/file.txt"
+//     ["folder", "file.txt"], // "./folder/file.txt"
+//     ["../folder", "file.txt"], // "../folder/file.txt"
+//     ["../../folder", "file.txt"], // "../../folder/file.txt"
+// ].forEach((parts) => {
+//     // console.log(partsToPath(parts), resolve(...parts));
+//     log("resolve:", LogLevel.Debug, resolve(...parts));
+// });

@@ -18,9 +18,10 @@ export const mkdirCommand = new Command({
         {
             name: "path",
             description: "The path to the directory to create",
+            type: "path",
             defaultValue: "",
             required: true,
-        } as CommandArgument<string>,
+        } as CommandArgument<"path">,
     ],
 
     // The flags for the command
@@ -42,9 +43,10 @@ export const touchCommand = new Command({
         {
             name: "path",
             description: "The path of the file to create",
+            type: "path",
             defaultValue: "",
             required: true,
-        },
+        } as CommandArgument<"path">,
     ],
 
     // The flags for the command
@@ -72,9 +74,10 @@ export const catCommand = new Command({
         {
             name: "path",
             description: "The path of the file to read",
+            type: "path",
             defaultValue: "",
             required: true,
-        },
+        } as CommandArgument<"path">,
     ],
 
     // The flags for the command

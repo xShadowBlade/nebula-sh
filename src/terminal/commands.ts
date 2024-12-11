@@ -13,13 +13,15 @@ export type FlagTypes = boolean | string | number;
 /**
  * Possible flag types as strings.
  */
-export type FlagTypeString = "boolean" | "string" | "number";
+export type FlagTypeString = "boolean" | "string" | "number" | "path";
 
 // eslint-disable-next-line prettier/prettier
 export type StringToFlagType<T extends FlagTypeString> = 
     T extends "boolean" ? boolean :
     T extends "string" ? string :
     T extends "number" ? number :
+    // TODO: Add path type
+    T extends "path" ? string :
     undefined;
 
 /**
@@ -100,8 +102,8 @@ export interface CommandArgument<TFlagTypeString extends FlagTypeString = FlagTy
  */
 export type GetFlagRecord<TFlags extends CommandFlag[]> = ObjectFromEntries<{
     // Convert the flag to a tuple of [name, type].
-    [K in keyof TFlags]: TFlags[K] extends CommandFlag<infer TPrimaryFlagName, infer TFlagType>
-        ? [TPrimaryFlagName, TFlagType]
+    [K in keyof TFlags]: TFlags[K] extends CommandFlag<infer TPrimaryFlagName, infer TFlagTypeString>
+        ? [TPrimaryFlagName, StringToFlagType<TFlagTypeString>]
         : never;
 }>;
 

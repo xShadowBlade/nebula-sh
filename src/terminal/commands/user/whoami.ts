@@ -8,7 +8,6 @@ export const whoamiCommand = new Command({
     name: "whoami",
     description: "Print the current user",
 
-    // The arguments for the command
     arguments: [],
 
     flags: [],
@@ -23,7 +22,6 @@ export const listUsersCommand = new Command({
     name: "listusers",
     description: "List all users",
 
-    // The arguments for the command
     arguments: [],
 
     flags: [],

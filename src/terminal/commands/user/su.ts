@@ -13,6 +13,7 @@ export const suCommand = new Command({
         {
             name: "user",
             description: "The user to switch to",
+            type: "string",
             defaultValue: "root",
             required: false,
         },
