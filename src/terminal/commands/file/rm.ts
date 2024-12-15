@@ -1,8 +1,8 @@
 /**
  * @file Declares the rm command.
  */
-import type { CommandArgument, CommandFlag } from "../../commands";
-import { Command } from "../../commands";
+import type { CommandArgument, CommandFlag } from "../../command";
+import { Command } from "../../command";
 import { log, LogLevel } from "../../utils/log";
 import { Filesystem } from "../../../filesystem/filesystem";
 

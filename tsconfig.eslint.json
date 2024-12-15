@@ -7,12 +7,10 @@
 		"lib": ["ESNext", "dom"],
 		"esModuleInterop": true,
 		"skipLibCheck": true,
-		"declaration": true,
-		"emitDeclarationOnly": true,
 		"forceConsistentCasingInFileNames": true,
 		"moduleResolution": "NodeNext",
 		"baseUrl": "./src",  // Adjust this based on your project structure
-		"outDir": "./dist/types",  // Adjust this based on your project structure
+		"outDir": "./dist",  // Adjust this based on your project structure
 		"sourceMap": true
 	},
 	"include": [
@@ -20,8 +18,10 @@
 		"src/**/*.tsx",
 		"src/**/*.js",
 		"src/**/*.jsx",
+		"test/xterm/**/*.ts"
 	],
 	"exclude": [
 	  	"node_modules/",
+		"test/xterm/node_modules/"
 	]
 }

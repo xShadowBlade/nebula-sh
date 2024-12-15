@@ -1,7 +1,7 @@
 /**
  * @file Declares the su command.
  */
-import { Command } from "../../commands";
+import { Command } from "../../command";
 import { log, LogLevel } from "../../utils/log";
 
 export const suCommand = new Command({

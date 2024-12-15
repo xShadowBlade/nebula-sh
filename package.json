@@ -11,18 +11,24 @@
   },
   "license": "MIT",
   "author": "xShadowBlade",
-  "main": "./dist/indexNode.js",
   "exports": {
     ".": {
+      "types": "./dist/types/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./node": {
+    "./xterm": {
+      "types": "./dist/types/xterm/index.d.ts",
+      "default": "./dist/xterm/index.js"
+    },
+    "./node-repl": {
+      "types": "./dist/types/indexNode.d.ts",
       "default": "./dist/indexNode.js"
     }
   },
   "scripts": {
-    "build": "esbuild ./src/index.ts ./src/indexNode.ts --bundle --minify --platform=node --sourcemap --outdir=./dist/",
-    "dev": "esbuild ./src/index.ts ./src/indexNode.ts --bundle --platform=node --sourcemap --outdir=./dist/ --watch",
+    "build": "esbuild ./src/index.ts ./src/xterm/index.ts ./src/indexNode.ts --bundle --minify --platform=node --sourcemap --outdir=./dist/",
+    "build:types": "tsc --declaration --emitDeclarationOnly --outDir ./dist/types",
+    "dev": "esbuild ./src/index.ts ./src/xterm/index.ts ./src/indexNode.ts --bundle --platform=node --sourcemap --outdir=./dist/ --watch",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint --fix src/**/*.ts"
   },

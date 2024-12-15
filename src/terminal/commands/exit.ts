@@ -1,7 +1,7 @@
 /**
  * @file Declares the exit command.
  */
-import { Command } from "../commands";
+import { Command } from "../command";
 
 export const exitCommand = new Command({
     name: "exit",

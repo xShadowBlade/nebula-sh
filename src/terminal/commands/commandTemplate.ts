@@ -1,7 +1,7 @@
 /**
  * @file Declares a template for a command.
  */
-import { Command } from "../commands";
+import { Command } from "../command";
 import { log, LogLevel } from "../utils/log";
 
 export const templateCommand = new Command({
