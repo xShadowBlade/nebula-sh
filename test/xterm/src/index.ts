@@ -5,6 +5,7 @@
 // import { createRoot } from "react-dom/client";
 
 import { Terminal } from "@xterm/xterm";
+// import { NebulaShAddon } from "nebula-sh";
 
 /**
  * @returns The root component of the application.

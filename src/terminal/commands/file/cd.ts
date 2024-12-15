@@ -1,7 +1,7 @@
 /**
  * @file Declares the cd and pwd commands.
  */
-import { Command } from "../../commands";
+import { Command } from "../../command";
 
 import { log, LogLevel } from "../../utils/log";
 import { Filesystem } from "../../../filesystem/filesystem";

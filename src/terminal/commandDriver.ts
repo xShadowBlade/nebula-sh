@@ -2,8 +2,8 @@
  * @file Declares the command driver class.
  */
 import { log, LogLevel } from "./utils/log";
-import type { Command } from "./commands";
-import type { CommandFlag, FlagTypes, OnCommand } from "./commands";
+import type { Command } from "./command";
+import type { CommandFlag, FlagTypes, OnCommand } from "./command";
 import type { ConsoleHost } from "./consoleHost";
 import { checkPrivilege } from "../computer/user/privileges";
 
@@ -278,12 +278,15 @@ export class CommandDriver {
 
             // If the argument is not provided, assign the default value
             if (!args[index]) {
+                // TODO: Fix this
+                // @ts-expect-error - Default value can sometimes be undefined
                 args[index] = argument.defaultValue;
             }
         }
 
         // Run the command
         this.runCommand(commandToRun, consoleHost, {
+            // @ts-expect-error - Default values are assigned
             args,
             flags: flagsWithDefaults,
             ...options,

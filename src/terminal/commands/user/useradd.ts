@@ -1,8 +1,8 @@
 /**
  * @file Declares a template for a command.
  */
-import type { CommandArgument } from "../../commands";
-import { Command } from "../../commands";
+import type { CommandArgument } from "../../command";
+import { Command } from "../../command";
 import { log, LogLevel } from "../../utils/log";
 import { checkPrivilege, Privileges } from "../../../computer/user/privileges";
 import { User } from "../../../computer/user/user";
