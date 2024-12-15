@@ -139,6 +139,9 @@ export class CommandDriver {
             commandToRun.onCommand(commandOptions);
         } catch (e) {
             log(e, LogLevel.Error);
+            // console.trace();
+            // TODO: log the error
+            console.error(e);
         }
     }
 

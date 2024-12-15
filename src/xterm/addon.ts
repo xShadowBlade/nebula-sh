@@ -6,6 +6,8 @@ import type { Terminal, IDisposable, ITerminalAddon } from "@xterm/xterm";
 import type { Computer } from "../computer/computer";
 import { defaultComputer } from "../computer/computer";
 
+import { modifyLog } from "../terminal/utils/log";
+
 // Example
 // class DataLoggerAddon {
 //     private _disposables: IDisposable[] = [];
@@ -33,11 +35,21 @@ export class NebulaShAddon implements ITerminalAddon {
     private static generateEventListeners = (terminal: Terminal, addon: NebulaShAddon): IDisposable[] => [
         // When the terminal receives data, handle it.
         terminal.onData((data) => {
+            // If the data is a backspace character, remove the last character from the current line.
+            if (data === "\x7f") {
+                addon.currentLine = addon.currentLine.slice(0, -1);
+                terminal.write("\b \b");
+                return;
+            }
+
             // Write the data to the terminal.
             terminal.write(data);
 
             // If the data is a newline character, handle the command.
             if (data === "\r") {
+                // Move the cursor to the next line.
+                terminal.write("\n");
+
                 // Handle the command.
                 addon.computer.consoleHost.runCommand(addon.currentLine);
 
@@ -50,6 +62,11 @@ export class NebulaShAddon implements ITerminalAddon {
                 // Display the prompt.
                 addon.displayPrompt(terminal);
 
+                return;
+            }
+
+            // If the data is a control character, ignore it.
+            if (data.charCodeAt(0) < 32) {
                 return;
             }
 
@@ -92,6 +109,9 @@ export class NebulaShAddon implements ITerminalAddon {
     public activate(terminal: Terminal): void {
         // this.disposables.push(terminal.onData((d) => console.log(d)));
 
+        // Modify the log utility.
+        modifyLog(terminal);
+
         // Add the event listeners.
         this.disposables.push(...NebulaShAddon.generateEventListeners(terminal, this));
 
@@ -112,9 +132,15 @@ export class NebulaShAddon implements ITerminalAddon {
     /**
      * Displays the prompt in the terminal.
      * @param terminal - The terminal.
+     * @param resetLine - Whether to clear the current line. Default is `true`.
      */
-    public displayPrompt(terminal: Terminal): void {
+    public displayPrompt(terminal: Terminal, resetLine = true): void {
         const prompt = this.computer.consoleHost.getPrompt();
+
+        // If the `resetLine` parameter is `true`, clear the current line.
+        if (resetLine) {
+            terminal.write("\r");
+        }
 
         terminal.write(prompt);
     }

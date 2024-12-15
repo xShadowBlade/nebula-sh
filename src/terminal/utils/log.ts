@@ -1,6 +1,7 @@
 /**
  * @file Declares the log utility.
  */
+import type { Terminal } from "@xterm/xterm";
 
 /**
  * Possible log levels.
@@ -87,8 +88,9 @@ export const ConsoleColors = {
  * @param message - The message to log. If {@link LogLevel} is {@link LogLevel.Shell}, this should be the path.
  * @param level - The log level
  * @param optionalParams - The optional parameters to log. (see {@link console.log}). If {@link LogLevel} is {@link LogLevel.Shell}, this should be the command.
+ * @returns The logged message and optional parameters.
  */
-export function log(message: unknown, level: LogLevel = LogLevel.Log, ...optionalParams: unknown[]): void {
+export let log = function log(message: unknown, level: LogLevel = LogLevel.Log, ...optionalParams: unknown[]): unknown[] {
     /**
      * The prefix/color for the debug message.
      * See {@link https://stackoverflow.com/a/41407246/4808079} for more colors.
@@ -122,10 +124,34 @@ export function log(message: unknown, level: LogLevel = LogLevel.Log, ...optiona
         default:
             console.log(message, ...optionalParams);
             // break;
-            return;
+            return [message, ...optionalParams];
     }
 
-    console.log(formatString, message, ...optionalParams);
+    const logParams: unknown[] = [formatString, message, ...optionalParams];
+
+    console.log(...logParams);
+
+    return logParams;
+};
+
+/**
+ * Modifies the log utility.
+ * @param terminal - The terminal.
+ */
+export function modifyLog(terminal: Terminal): void {
+    const originalLog = log;
+
+    log = function log(message: unknown, level: LogLevel = LogLevel.Log, ...optionalParams: unknown[]): unknown[] {
+        const stringMessage = originalLog(message, level, ...optionalParams) as string[];
+
+        // Write the message to the terminal
+        terminal.write(
+            // Replace %s in stringMessage[0] with stringMessage[1]
+            stringMessage[0].replace(/%s/g, stringMessage[1]?.toString()) + "\n",
+        );
+
+        return stringMessage;
+    };
 }
 
 // Test
