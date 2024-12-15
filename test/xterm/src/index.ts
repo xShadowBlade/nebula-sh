@@ -1,30 +1,27 @@
 /**
  * @file This file is the entry point for your project.
  */
-// import React from "react";
-// import { createRoot } from "react-dom/client";
+
+import "@xterm/xterm";
+import "@xterm/xterm/css/xterm.css";
 
 import { Terminal } from "@xterm/xterm";
-// import { NebulaShAddon } from "nebula-sh";
+import { NebulaShAddon } from "nebula-sh";
 
-/**
- * @returns The root component of the application.
- */
-// const App: React.FC = () => {
-//     return (
-//         <>
-//             <p>Hello World!</p>
-//         </>
-//     );
-// };
+// import * as NebulaSh from "nebula-sh";
 
-// const root = createRoot(document.getElementById("root") ?? document.body);
-// root.render(<App />);
+// Test
+// console.log(NebulaSh);
 
 // Create a new terminal
 const terminal = new Terminal();
 
 // Load the addon
+const addon = new NebulaShAddon();
+terminal.loadAddon(addon);
+
+// Debug
+Object.assign(window, { terminal, addon });
 
 // Attach the terminal to the DOM
 terminal.open(document.getElementById("root") ?? document.body);

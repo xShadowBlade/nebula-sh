@@ -45,7 +45,7 @@ export class Computer {
 /**
  * The default computer with the built-in commands.
  */
-export const defaultComputer = new Computer();
+const defaultComputer = new Computer();
 
 // Add the built-in commands
 [
@@ -66,6 +66,9 @@ export const defaultComputer = new Computer();
 ].forEach((command) => {
     defaultComputer.commandDriver.addCommand(command);
 });
+
+// Export after adding the built-in commands
+export { defaultComputer };
 
 // Run some commands
 // TODO: Move these tests to an actual test file
