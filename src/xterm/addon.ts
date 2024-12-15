@@ -42,6 +42,42 @@ export class NebulaShAddon implements ITerminalAddon {
                 return;
             }
 
+            // If the data is an up arrow or down arrow, navigate the history.
+            if (data === "\x1b[A" || data === "\x1b[B") {
+                // If the data is an up arrow, move up in the history.
+                if (data === "\x1b[A") {
+                    addon.historyPosition++;
+                }
+
+                // If the data is a down arrow, move down in the history.
+                if (data === "\x1b[B") {
+                    addon.historyPosition--;
+                }
+
+                // Clamp the history position to the bounds of the history array.
+                addon.historyPosition = Math.max(
+                    0,
+                    Math.min(addon.historyPosition, addon.computer.consoleHost.history.length - 1),
+                );
+
+                // Get the command from the history.
+                const command =
+                    addon.computer.consoleHost.history[
+                        addon.computer.consoleHost.history.length - 1 - addon.historyPosition
+                    ];
+
+                // Clear the current line.
+                terminal.write("\r\x1b[K");
+
+                // Display the command.
+                terminal.write(addon.computer.consoleHost.getPrompt() + command);
+
+                // Set the current line to the command.
+                addon.currentLine = command;
+
+                return;
+            }
+
             // Write the data to the terminal.
             terminal.write(data);
 
@@ -85,6 +121,12 @@ export class NebulaShAddon implements ITerminalAddon {
      * The computer.
      */
     public computer: Computer;
+
+    /**
+     * The current position in the history.
+     * Note: 0 is the most recent entry (last element in the array), 1 is the second most recent, etc.
+     */
+    private historyPosition = 0;
 
     /**
      * The current line (not including the prompt).

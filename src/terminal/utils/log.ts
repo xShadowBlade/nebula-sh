@@ -90,7 +90,11 @@ export const ConsoleColors = {
  * @param optionalParams - The optional parameters to log. (see {@link console.log}). If {@link LogLevel} is {@link LogLevel.Shell}, this should be the command.
  * @returns The logged message and optional parameters.
  */
-export let log = function log(message: unknown, level: LogLevel = LogLevel.Log, ...optionalParams: unknown[]): unknown[] {
+export let log = function log(
+    message: unknown,
+    level: LogLevel = LogLevel.Log,
+    ...optionalParams: unknown[]
+): unknown[] {
     /**
      * The prefix/color for the debug message.
      * See {@link https://stackoverflow.com/a/41407246/4808079} for more colors.
@@ -147,7 +151,10 @@ export function modifyLog(terminal: Terminal): void {
         // Write the message to the terminal
         terminal.write(
             // Replace %s in stringMessage[0] with stringMessage[1]
-            stringMessage[0].replace(/%s/g, stringMessage[1]?.toString()) + "\n",
+            stringMessage[0]
+                .replace(/%s/g, stringMessage[1]?.toString())
+                // Replace \n with \r\n
+                .replace(/\n/g, "\r\n") + "\r\n",
         );
 
         return stringMessage;
