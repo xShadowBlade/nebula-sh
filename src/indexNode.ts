@@ -6,19 +6,23 @@ import { defaultComputer } from "./computer/computer";
 // Node exclusive imports
 import readline from "node:readline/promises";
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-});
+/**
+ * Runs the application in a node repl.
+ */
+export async function run(): Promise<void> {
+    // Create a readline interface
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
 
-// Handle SIGINT
-process.on("SIGINT", () => {
-    rl.close();
-    process.exit(0);
-});
+    // Handle SIGINT (Ctrl+C) gracefully
+    process.on("SIGINT", () => {
+        rl.close();
+        process.exit(0);
+    });
 
-// Start the loop
-(async (): Promise<void> => {
+    // Start the loop
     console.clear();
 
     while (true) {
@@ -26,4 +30,4 @@ process.on("SIGINT", () => {
             defaultComputer.consoleHost.runCommand(input, undefined, false);
         });
     }
-})();
+}
