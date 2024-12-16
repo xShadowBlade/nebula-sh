@@ -113,6 +113,21 @@ export class File {
         this.name = name;
         this.content = content;
     }
+
+    /**
+     * Saves the file to localStorage.
+     * @param storageObject - The storage object to save to. Default is `localStorage`
+     */
+    public saveToLocalStorage(storageObject?: Storage): void {
+        // If localStorage is not available, throw an error
+        if (typeof localStorage === "undefined" && !storageObject) {
+            throw new Error("localStorage is not available in this environment");
+        }
+
+        storageObject = storageObject ?? localStorage;
+
+        localStorage.setItem(this.name, this.toString());
+    }
 }
 
 // Test
