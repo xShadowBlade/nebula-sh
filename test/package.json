@@ -1,8 +1,10 @@
 {
   "name": "test",
   "private": true,
+  "type": "module",
   "scripts": {
-    "esbuild": "esbuild ./tests/**/*.test.ts --bundle --outdir=build/ --platform=node --format=esm --sourcemap --external:nebula-sh --external:mocha --external:chai",
+    "build": "esbuild ./tests/**/*.test.ts --bundle --outdir=build/ --platform=node --format=esm --sourcemap --external:nebula-sh --external:mocha --external:chai",
+    "build:watch": "esbuild ./tests/**/*.test.ts --bundle --outdir=build/ --platform=node --format=esm --sourcemap --external:nebula-sh --external:mocha --external:chai --watch",
     "test": "mocha build/**/*.test.js --exit"
   },
   "dependencies": {
