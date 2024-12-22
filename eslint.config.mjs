@@ -26,8 +26,8 @@ export default tseslint.config(
                 ecmaVersion: "latest",
             },
         },
-        files: ["src/**/*.ts", "src/**/*.tsx", "test/xterm/**/*.ts"],
-        ignores: ["node_modules", "test/xterm/node_modules", "dist"],
+        files: ["src/**/*.ts", "src/**/*.tsx", "test/xterm/**/*.ts", "test/**/*.ts"],
+        ignores: ["node_modules", "test/xterm/node_modules", "test/node_modules", "dist", "test/build/"],
         rules: {
             "prettier/prettier": "warn",
 

@@ -1,27 +1,17 @@
 {
-	"compilerOptions": {
-		"allowJs": true,
-		"target": "ES5",
-		"module": "NodeNext",
-		"strict": true,
-		"lib": ["ESNext", "dom"],
-		"esModuleInterop": true,
-		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true,
-		"moduleResolution": "NodeNext",
-		"baseUrl": "./src",  // Adjust this based on your project structure
-		"outDir": "./dist",  // Adjust this based on your project structure
-		"sourceMap": true
-	},
+	"extends": "./tsconfig.json",
 	"include": [
 		"src/**/*.ts",
 		"src/**/*.tsx",
 		"src/**/*.js",
 		"src/**/*.jsx",
-		"test/xterm/**/*.ts"
+		"test/xterm/**/*.ts",
+		"test/**/*.ts"
 	],
 	"exclude": [
 	  	"node_modules/",
-		"test/xterm/node_modules/"
+		"test/xterm/node_modules/",
+		"test/node_modules/",
+		"test/build/",
 	]
 }
