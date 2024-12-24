@@ -45,6 +45,7 @@ export class CommandDriver {
      * A list of temporary characters that are replaced in the command string AFTER parsing.
      * @example "\\SPACE" -> " "
      */
+    // Reverse the key/value pairs
     private static temporaryReplacedToCharacter = Object.fromEntries(
         Object.entries(CommandDriver.temporaryCharacterToReplaced).map(([key, value]) => [value, key]),
     );
@@ -63,11 +64,13 @@ export class CommandDriver {
         if (value === "true") return true;
         if (value === "false") return false;
         if (!isNaN(Number(value))) return Number(value);
+
         return value;
     }
 
     /**
      * A list of commands.
+     * Each command should be added using {@link addCommand} before it can be run.
      */
     public commands: Command[] = [];
 
@@ -85,6 +88,7 @@ export class CommandDriver {
      * Adds a command.
      * @param command - The command to add.
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public addCommand(command: Command<any>): void {
         this.commands.push(command);
     }

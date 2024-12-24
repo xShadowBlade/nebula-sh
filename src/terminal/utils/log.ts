@@ -5,6 +5,7 @@ import type { Terminal } from "@xterm/xterm";
 
 /**
  * Possible log levels.
+ * Each log level is displayed separately.
  */
 export enum LogLevel {
     /**
@@ -38,7 +39,7 @@ export enum LogLevel {
     Log = "LOG",
 
     /**
-     * A log for the shell.
+     * A log for the shell prompt.
      * Path is displayed in blue, and the command is displayed in green.
      */
     Shell = "SHELL",
@@ -90,6 +91,7 @@ export const ConsoleColors = {
  * @param optionalParams - The optional parameters to log. (see {@link console.log}). If {@link LogLevel} is {@link LogLevel.Shell}, this should be the command.
  * @returns The logged message and optional parameters.
  */
+// TODO: switch the order of the `level` and `message` params
 export let log = function log(
     message: unknown,
     level: LogLevel = LogLevel.Log,
@@ -139,7 +141,8 @@ export let log = function log(
 };
 
 /**
- * Modifies the log utility.
+ * Modifies the log utility to use xterm.js logging instead.
+ * This changes the original `log` function.
  * @param terminal - The terminal.
  */
 export function modifyLog(terminal: Terminal): void {
