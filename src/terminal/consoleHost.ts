@@ -21,6 +21,11 @@ export enum ConsoleModes {
      * test
      */
     Repl = "repl",
+
+    /**
+     * A blank console that can be typed in.
+     */
+    Editor = "editor",
 }
 
 /**
@@ -88,10 +93,34 @@ export class ConsoleHost {
     }
 
     /**
-     * The current mode the console instance is in
+     * A private member for the mode the console instance is in.
      * @default ConsoleModes.Repl
      */
-    public currentMode: ConsoleModes = ConsoleModes.Repl;
+    private _currentMode: ConsoleModes = ConsoleModes.Repl;
+
+    /**
+     * @returns The current mode the console instance is in.
+     */
+    public get currentMode(): ConsoleModes {
+        return this._currentMode;
+    }
+
+    public set currentMode(mode: ConsoleModes) {
+        this._currentMode = mode;
+
+        // Different behavior depending on which mode is being switched to
+        switch (mode) {
+            case ConsoleModes.Repl:
+            default:
+                // Re-log the prompt (it was probably cleared)
+                // this.logPrompt();
+                break;
+            case ConsoleModes.Editor:
+                // Clear the console
+                // TODO: xterm.js support
+                console.clear();
+        }
+    }
 
     /**
      * Constructs a new console host.
@@ -135,6 +164,15 @@ export class ConsoleHost {
     }
 
     /**
+     * Logs the prompt to the console (using `console.log`).
+     * Use of this is discouraged.
+     * @param command - An optional command to add to the end of the prompt
+     */
+    public logPrompt(command?: string): void {
+        console.log(this.getPrompt() + command);
+    }
+
+    /**
      * Runs a command.
      * @param command - The command to run.
      * @param options - The command options.
@@ -146,7 +184,7 @@ export class ConsoleHost {
         logPrompt = true,
     ): void {
         // Log the prompt if specified
-        if (logPrompt) console.log(this.getPrompt() + command);
+        if (logPrompt) this.logPrompt();
 
         // Debug: log command
         // log(command, LogLevel.Debug);
