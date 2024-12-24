@@ -9,6 +9,21 @@ import { ConsoleColors, log, LogLevel } from "./utils/log";
 import { User } from "../computer/user/user";
 
 /**
+ * Possible modes for the console host to be in
+ */
+export enum ConsoleModes {
+    /**
+     * A standard repl loop.
+     * The default mode.
+     * @example
+     * nebula-sh root:/$ mkdir test
+     * nebula-sh root:/$ ls
+     * test
+     */
+    Repl = "repl",
+}
+
+/**
  * The console host options.
  */
 export interface ConsoleHostOptions {
@@ -20,6 +35,8 @@ export interface ConsoleHostOptions {
 
 /**
  * The console host.
+ * This represents an instance of a console.
+ * There can be multiple ConsoleHosts for a computer.
  */
 // TODO: Add users
 export class ConsoleHost {
@@ -71,13 +88,10 @@ export class ConsoleHost {
     }
 
     /**
-     * Gets a user by name.
-     * @param name - The user's name.
-     * @returns The user, if found.
+     * The current mode the console instance is in
+     * @default ConsoleModes.Repl
      */
-    public getUser(name: string): User | undefined {
-        return this.users.find((user) => user.name === name);
-    }
+    public currentMode: ConsoleModes = ConsoleModes.Repl;
 
     /**
      * Constructs a new console host.
@@ -96,14 +110,26 @@ export class ConsoleHost {
     }
 
     /**
+     * Gets a user by name.
+     * @param name - The user's name.
+     * @returns The user, if found.
+     */
+    public getUser(name: string): User | undefined {
+        return this.users.find((user) => user.name === name);
+    }
+
+    /**
      * Gets the prompt for the console.
      * @returns The prompt.
      * @example "nebula-sh root:/home$ " // also with colors
      */
     public getPrompt(): string {
         return (
+            // "nebula-sh "
             `${ConsoleColors.fg.magenta}${ConsoleColors.dim}nebula-sh${ConsoleColors.reset} ` +
+            // "${user}:"
             `${ConsoleColors.fg.green}${this.currentUser.name}${ConsoleColors.reset}:` +
+            // "${cwd}$ "
             `${ConsoleColors.fg.blue}${this.currentWorkingDirectory.path || "/"}${ConsoleColors.reset}$ `
         );
     }
@@ -119,8 +145,7 @@ export class ConsoleHost {
         options?: Parameters<CommandDriver["runCommandString"]>[2],
         logPrompt = true,
     ): void {
-        // TODO: Switch to xterm.js
-        // log(this.currentWorkingDirectory.path || "/", LogLevel.Shell, command);
+        // Log the prompt if specified
         if (logPrompt) console.log(this.getPrompt() + command);
 
         // Debug: log command
