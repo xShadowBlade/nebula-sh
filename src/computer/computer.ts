@@ -40,6 +40,15 @@ export class Computer {
         computer: this,
         commandDriver: this.commandDriver,
     });
+
+    /**
+     * Resets the computer by resetting the filesystem and console host.
+     * See {@link Filesystem.reset} and {@link ConsoleHost.reset}.
+     */
+    public reset(): void {
+        this.filesystem.reset();
+        this.consoleHost.reset();
+    }
 }
 
 /**

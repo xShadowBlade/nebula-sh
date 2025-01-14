@@ -135,4 +135,12 @@ export class ConsoleHost {
         // Add the command to the history
         this.history.push(command);
     }
+
+    /**
+     * Resets the console host by clearing the current working directory and history.
+     */
+    public reset(): void {
+        this.currentWorkingDirectory = this.computer.filesystem.root;
+        this.history = [];
+    }
 }

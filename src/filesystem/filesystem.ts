@@ -95,4 +95,15 @@ export class Filesystem {
     public makeDirectory(pathOrParts: string | string[], currentWorkingDirectory: Directory = this.root): void {
         currentWorkingDirectory.makeDirectory(pathOrParts);
     }
+
+    /**
+     * Resets the filesystem by clearing the root directory.
+     */
+    public reset(): void {
+        // TODO: Optimize garbage collection
+        // @ts-expect-error - temporarily allow deleting root
+        delete this.root;
+
+        this.root = new Directory({ name: "", isRoot: true });
+    }
 }
