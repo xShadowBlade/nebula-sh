@@ -29,6 +29,15 @@ export const cdCommand = new Command({
 
         const path = args[0];
 
+        // Special case for changing to the root directory
+        if (path === "/") {
+            // Set the current working directory
+            options.consoleHost.currentWorkingDirectory = options.consoleHost.computer.filesystem.root;
+
+            // log("Changed to root directory", LogLevel.Log);
+            return;
+        }
+
         // Get the directory
         const directory = options.currentWorkingDirectory.getDirectory(path);
 
