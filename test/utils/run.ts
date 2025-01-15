@@ -14,13 +14,20 @@ interface RunCommandOptions {
      * @default false
      */
     resetComputer?: boolean;
+
+    /**
+     * Whether to log the prompt, or display commands in the console.
+     * @default false
+     */
+    logPrompt?: boolean;
 }
 
 /**
  * The default run command options.
  */
-const defaultRunCommandOptions: RunCommandOptions = {
+const defaultRunCommandOptions: Required<RunCommandOptions> = {
     resetComputer: false,
+    logPrompt: false,
 };
 
 /**
@@ -44,11 +51,13 @@ export async function runCommand(
     runCommandOptions?: Parameters<ConsoleHost["runCommand"]>[1],
 ): Promise<Computer> {
     // Get the options
-    const { resetComputer } = { ...defaultRunCommandOptions, ...options };
+    options = { ...defaultRunCommandOptions, ...options };
+
+    const { resetComputer, logPrompt } = options;
 
     // For each command, run it
     for (const command of commands) {
-        await defaultComputer.consoleHost.runCommand(command, runCommandOptions);
+        await defaultComputer.consoleHost.runCommand(command, runCommandOptions, logPrompt);
     }
 
     // Reset the computer if needed
