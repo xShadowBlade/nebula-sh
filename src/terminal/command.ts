@@ -131,7 +131,7 @@ export type ObjectFromEntries<T extends [string, unknown][]> = {
  * type MyArgs = GetArgsFromArray<MyArguments>; // [string, number]
  */
 export type GetArgsFromArray<T extends CommandArgument[]> = {
-    [K in keyof T]: T[K] extends CommandArgument<infer TFlagType> ? TFlagType : never;
+    [K in keyof T]: T[K] extends CommandArgument<infer TFlagType> ? StringToFlagType<TFlagType> : never;
 };
 
 // test

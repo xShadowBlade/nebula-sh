@@ -54,7 +54,9 @@ export class Directory {
         //     name: this.name,
         // });
 
-        return this.parent ? `${this.parent.path}/${this.name}` : this.name;
+        // return this.parent ? `${this.parent.path}/${this.name}` : this.name;
+        return this.isRoot ? "/" : 
+            `${this.parent?.path ?? ""}${this.parent?.isRoot ? "" : "/"}${this.name}`;
     }
 
     /**

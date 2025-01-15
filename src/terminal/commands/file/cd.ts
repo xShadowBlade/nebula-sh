@@ -1,7 +1,7 @@
 /**
  * @file Declares the cd and pwd commands.
  */
-import { Command } from "../../command";
+import { Command, CommandArgument } from "../../command";
 
 import { log, LogLevel } from "../../utils/log";
 import { Filesystem } from "../../../filesystem/filesystem";
@@ -18,7 +18,7 @@ export const cdCommand = new Command({
             type: "string",
             defaultValue: ".",
             required: true,
-        },
+        } as CommandArgument<"string">,
     ],
 
     flags: [],
