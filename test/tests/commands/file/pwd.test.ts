@@ -7,23 +7,12 @@ import { assert } from "chai";
 
 import { runCommand } from "../../../utils/run";
 import { expectMessage } from "../../../utils/messages";
+import { BaseCommandTestCase } from "../../../utils/testCase";
 
 /**
  * A test case for the pwd command.
  */
-interface PwdCommandTestCase {
-    /**
-     * The name/description of the test case.
-     * @example "should print working directory"
-     */
-    description: string;
-
-    /**
-     * The commands to run.
-     * @example ["pwd"]
-     */
-    commands: string[];
-
+interface PwdCommandTestCase extends BaseCommandTestCase {
     /**
      * The expected output of the command.
      * @example "/test"

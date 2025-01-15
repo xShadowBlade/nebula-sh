@@ -7,23 +7,12 @@ import { assert } from "chai";
 
 import { runCommand } from "../../../utils/run";
 import { expectMessage } from "../../../utils/messages";
+import type { BaseCommandTestCase } from "../../../utils/testCase";
 
 /**
  * A test case for the cd command.
  */
-interface CdCommandTestCase {
-    /**
-     * The name/description of the test case.
-     * @example "should change directory"
-     */
-    description: string;
-
-    /**
-     * The commands to run.
-     * @example ["mkdir test", "cd test"]
-     */
-    commands: string[];
-
+interface CdCommandTestCase extends BaseCommandTestCase {
     /**
      * The expected path of the current working directory.
      * @example "/test"
