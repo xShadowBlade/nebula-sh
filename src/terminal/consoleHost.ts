@@ -60,7 +60,6 @@ export class ConsoleHost {
     /**
      * Stored messages.
      */
-    // TODO: This is not reset when {@link reset} is called
     public storedLogs: StoredLog[] = [];
 
     /**
@@ -160,5 +159,6 @@ export class ConsoleHost {
     public reset(): void {
         this.currentWorkingDirectory = this.computer.filesystem.root;
         this.history = [];
+        this.storedLogs = [];
     }
 }
