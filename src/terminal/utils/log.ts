@@ -2,6 +2,7 @@
  * @file Declares the log utility.
  */
 import type { Terminal } from "@xterm/xterm";
+import type { ConsoleHost, StoredLog } from "../consoleHost";
 
 /**
  * Possible log levels.
@@ -139,14 +140,42 @@ export let log = function log(
 };
 
 /**
- * Modifies the log utility.
- * @param terminal - The terminal.
+ * Modifies the log utility for the console host so it adds the message to an internal list of messages.
+ * @param consoleHost - The console host instance. See {@link ConsoleHost}.
  */
-export function modifyLog(terminal: Terminal): void {
+export function modifyLogConsoleHost(consoleHost: ConsoleHost) {
     const originalLog = log;
 
     log = function log(message: unknown, level: LogLevel = LogLevel.Log, ...optionalParams: unknown[]): unknown[] {
         const stringMessage = originalLog(message, level, ...optionalParams) as string[];
+
+        // Add the message to the consoleHost stored logs
+        consoleHost.storedLogs.push({
+            message,
+            level,
+            optionalParams,
+        });
+
+        return stringMessage;
+    };
+}
+
+/**
+ * Modifies the log utility for xterm.js
+ * @param consoleHost - The console host.
+ * @param terminal - The terminal.
+ */
+export function modifyLogXterm(consoleHost: ConsoleHost, terminal: Terminal): void {
+    const originalLog = log;
+
+    log = function log(message: unknown, level: LogLevel = LogLevel.Log, ...optionalParams: unknown[]): unknown[] {
+        const stringMessage = originalLog(message, level, ...optionalParams) as string[];
+
+        // Add the message to the consoleHost stored logs
+        consoleHost.storedLogs.push({
+            message: stringMessage[0],
+            level,
+        });
 
         // Write the message to the terminal
         terminal.write(

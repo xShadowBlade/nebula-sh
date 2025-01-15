@@ -15,6 +15,7 @@ import { suCommand } from "../terminal/commands/user/su";
 import { clearCommand, historyCommand } from "../terminal/commands/history";
 import { exitCommand } from "../terminal/commands/exit";
 import { rmCommand } from "../terminal/commands/file/rm";
+import { displayMessagesCommand } from "../terminal/commands/debug/displayMessages";
 
 /**
  * The computer class.
@@ -72,6 +73,7 @@ const defaultComputer = new Computer();
     exitCommand,
     rmCommand,
     helpCommand,
+    displayMessagesCommand,
 ].forEach((command) => {
     defaultComputer.commandDriver.addCommand(command);
 });

@@ -289,7 +289,6 @@ export class CommandDriver {
 
         // Run the command
         this.runCommand(commandToRun, consoleHost, {
-            // @ts-expect-error - Default values are assigned
             args,
             flags: flagsWithDefaults,
             ...options,

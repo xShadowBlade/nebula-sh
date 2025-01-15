@@ -5,7 +5,7 @@ import type { CommandDriver } from "./commandDriver";
 import type { Computer } from "../computer/computer";
 import type { Directory } from "../filesystem/directory";
 import { Privileges } from "../computer/user/privileges";
-import { ConsoleColors, log, LogLevel } from "./utils/log";
+import { ConsoleColors, log, LogLevel, modifyLogConsoleHost } from "./utils/log";
 import { User } from "../computer/user/user";
 
 /**
@@ -16,6 +16,15 @@ export interface ConsoleHostOptions {
     commandDriver: CommandDriver;
     users?: User[];
     currentUser?: User;
+}
+
+/**
+ * A stored log message produced by {@link log}.
+ */
+export interface StoredLog {
+    message: unknown;
+    level: LogLevel;
+    optionalParams?: unknown[];
 }
 
 /**
@@ -47,6 +56,12 @@ export class ConsoleHost {
      * The history of commands.
      */
     public history: string[] = [];
+
+    /**
+     * Stored messages.
+     */
+    // TODO: This is not reset when {@link reset} is called
+    public storedLogs: StoredLog[] = [];
 
     /**
      * A list of users.
@@ -93,6 +108,9 @@ export class ConsoleHost {
 
         // Set the current working directory to the root
         this.currentWorkingDirectory = this.computer.filesystem.root;
+
+        // Modify the log command
+        modifyLogConsoleHost(this);
     }
 
     /**
