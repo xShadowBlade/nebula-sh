@@ -5,8 +5,8 @@ import { LogLevel } from "nebula-sh";
 import { describe, it, beforeEach } from "mocha";
 import { assert } from "chai";
 
-import { runCommand } from "../../utils/run";
-import { expectMessage } from "../../utils/messages";
+import { runCommand } from "../../../utils/run";
+import { expectMessage } from "../../../utils/messages";
 
 /**
  * A test case for the cd command.
