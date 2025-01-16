@@ -7,7 +7,7 @@ import { assert } from "chai";
 
 import { runCommand } from "../../../utils/run";
 import { expectMessage } from "../../../utils/messages";
-import { BaseCommandTestCase } from "../../../utils/testCase";
+import { BaseCommandTestCase, createTestSuite } from "../../../utils/testCase";
 
 /**
  * A test case for the pwd command.
@@ -46,21 +46,16 @@ const testCases: PwdCommandTestCase[] = [
     },
 ];
 
-describe("pwd command", () => {
-    // Reset the computer before each test
-    beforeEach(() => {
-        runCommand([], { resetComputer: true });
-    });
+createTestSuite<PwdCommandTestCase>({
+    name: "pwd",
+    testCases,
+    runTestCase: async (testCase) => {
+        const { commands, expectedMessage } = testCase;
 
-    testCases.forEach((testCase) => {
-        it(testCase.description, async () => {
-            const { commands, expectedMessage } = testCase;
+        // Run the commands
+        await runCommand(commands);
 
-            // Run the commands
-            await runCommand(commands);
-
-            // Expect the message
-            assert.isTrue(expectMessage(LogLevel.Log, expectedMessage));
-        });
-    });
+        // Expect the message
+        assert.isTrue(expectMessage(LogLevel.Log, expectedMessage));
+    },
 });

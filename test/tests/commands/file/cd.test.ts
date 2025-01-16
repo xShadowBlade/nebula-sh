@@ -2,12 +2,12 @@
  * @file Test for cd command
  */
 import { LogLevel } from "nebula-sh";
-import { describe, it, beforeEach } from "mocha";
 import { assert } from "chai";
 
 import { runCommand } from "../../../utils/run";
 import { expectMessage } from "../../../utils/messages";
 import type { BaseCommandTestCase } from "../../../utils/testCase";
+import { createTestSuite } from "../../../utils/testCase";
 
 /**
  * A test case for the cd command.
@@ -58,26 +58,21 @@ const testCases: CdCommandTestCase[] = [
     },
 ];
 
-// Test the cd command
-describe("cd command", () => {
-    // Reset the computer before each test
-    beforeEach(() => {
-        runCommand([], { resetComputer: true });
-    });
+createTestSuite<CdCommandTestCase>({
+    name: "cd",
+    testCases,
+    runTestCase: async (testCase) => {
+        const { commands, expectedPath, expectedError } = testCase;
 
-    testCases.forEach((testCase) => {
-        // Run the test case with the given description
-        it(testCase.description, async () => {
-            // Run the commands
-            await runCommand(testCase.commands).then((computer) => {
-                // Check if the current working directory is the expected path
-                assert.strictEqual(computer.consoleHost.currentWorkingDirectory.path, testCase.expectedPath);
+        // Run the commands
+        const computer = await runCommand(commands);
 
-                // Check if an error is expected
-                if (testCase.expectedError) {
-                    assert.isTrue(expectMessage(LogLevel.Error, testCase.expectedError));
-                }
-            });
-        });
-    });
+        // Check if the current working directory is the expected path
+        assert.strictEqual(computer.consoleHost.currentWorkingDirectory.path, expectedPath);
+
+        // Check if an error is expected
+        if (testCase.expectedError) {
+            assert.isTrue(expectMessage(LogLevel.Error, expectedError));
+        }
+    },
 });

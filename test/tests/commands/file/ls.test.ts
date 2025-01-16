@@ -7,7 +7,8 @@ import { assert } from "chai";
 
 import { runCommand } from "../../../utils/run";
 import { expectMessage, expectMultipleMessages, expectNoMessages } from "../../../utils/messages";
-import { BaseCommandTestCase } from "../../../utils/testCase";
+import type { BaseCommandTestCase } from "../../../utils/testCase";
+import { createTestSuite } from "../../../utils/testCase";
 
 /**
  * A test case for the ls command.
@@ -61,28 +62,23 @@ const testCases: LsCommandTestCase[] = [
     },
 ];
 
-describe("ls command", () => {
-    // Reset the computer before each test
-    beforeEach(() => {
-        runCommand([], { resetComputer: true });
-    });
+createTestSuite<LsCommandTestCase>({
+    name: "ls",
+    testCases,
+    runTestCase: async (testCase) => {
+        const { commands, expectedMessage } = testCase;
 
-    testCases.forEach((testCase) => {
-        it(testCase.description, async () => {
-            const { commands, expectedMessage } = testCase;
+        // Run the commands
+        await runCommand(commands);
 
-            // Run the commands
-            await runCommand(commands);
+        // Expect the message
+        if (expectedMessage.length === 0) {
+            assert.isTrue(expectNoMessages());
+            return;
+        }
 
-            // Expect the message
-            if (expectedMessage.length === 0) {
-                assert.isTrue(expectNoMessages());
-                return;
-            }
+        const messagesToExpect = expectedMessage.map((message) => ({ level: LogLevel.Log, message }));
 
-            const messagesToExpect = expectedMessage.map((message) => ({ level: LogLevel.Log, message }));
-
-            assert.isTrue(expectMultipleMessages(messagesToExpect));
-        });
-    });
+        assert.isTrue(expectMultipleMessages(messagesToExpect));
+    },
 });
