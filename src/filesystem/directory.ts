@@ -213,6 +213,18 @@ export class Directory {
             return;
         }
 
+        // If the directory already exists, log an error
+        if (parentDirectory.getDirectoryInDirectory(parts[parts.length - 1])) {
+            log(`Directory "${parts[parts.length - 1]}" already exists`, LogLevel.Error);
+            return;
+        }
+
+        // If a file with the same name already exists, log an error
+        if (parentDirectory.getFileInDirectory(parts[parts.length - 1])) {
+            log(`File "${parts[parts.length - 1]}" already exists`, LogLevel.Error);
+            return;
+        }
+
         // Create the new directory
         const newDirectory = new Directory({
             // parts[parts.length - 1]
@@ -242,6 +254,18 @@ export class Directory {
                 `Directory "${typeof pathOrParts === "string" ? pathOrParts : Filesystem.partsToPath(pathOrParts)}" not found`,
                 LogLevel.Error,
             );
+            return;
+        }
+
+        // If the file already exists, log an error
+        if (parentDirectory.getFileInDirectory(fileToAdd.name)) {
+            log(`File "${fileToAdd.name}" already exists`, LogLevel.Error);
+            return;
+        }
+
+        // If a directory with the same name already exists, log an error
+        if (parentDirectory.getDirectoryInDirectory(fileToAdd.name)) {
+            log(`Directory "${fileToAdd.name}" already exists`, LogLevel.Error);
             return;
         }
 
