@@ -143,6 +143,28 @@ export class NebulaShAddon implements ITerminalAddon {
     }
 
     /**
+     * Adds data to the current line in override mode.
+     * @param data - The data to add.
+     * @param terminal - The terminal.
+     */
+    private addDataToCurrentLineOverrideMode(data: string, terminal: Terminal): void {
+        /**
+         * The cursor position relative to actual current line (excludes prompt).
+         */
+        const actualCursorPosition =
+            terminal.buffer.active.cursorX - this.computer.consoleHost.getRawPrompt().length - 1;
+
+        // Add the data to the current line at the cursor position (override mode).
+        this.currentLine =
+            // Data before the cursor
+            this.currentLine.slice(0, actualCursorPosition) +
+            // Data at the cursor
+            data +
+            // Data after the cursor
+            this.currentLine.slice(actualCursorPosition + 1);
+    }
+
+    /**
      * A function that generates event listeners for the terminal.
      * @param terminal - The terminal.
      * @param addon - The addon.
@@ -172,6 +194,7 @@ export class NebulaShAddon implements ITerminalAddon {
             // TODO: Add support for ctrl+backspace, ctrl+left, ctrl+right, etc.
 
             // Character is generic, write the data to the terminal.
+            // TODO: This is override mode, add support for insert mode.
             terminal.write(data);
 
             // If the data is a control character, don't add it to the current line.
@@ -179,8 +202,7 @@ export class NebulaShAddon implements ITerminalAddon {
                 return;
             }
 
-            // Add the data to the current line (if it's not a newline character).
-            addon.currentLine += data;
+            addon.addDataToCurrentLineOverrideMode(data, terminal);
         }),
     ];
 

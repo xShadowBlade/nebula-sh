@@ -24,6 +24,7 @@ const terminal = new Terminal({
     // cursorBlink: true,
     cursorStyle: "block",
     cursorInactiveStyle: "block",
+    altClickMovesCursor: false,
     smoothScrollDuration: 100,
 
     theme: {
