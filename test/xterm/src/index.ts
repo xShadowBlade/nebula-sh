@@ -6,12 +6,7 @@ import "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 
 import { Terminal } from "@xterm/xterm";
-import { NebulaShAddon } from "nebula-sh";
-
-// import * as NebulaSh from "nebula-sh";
-
-// Test
-// console.log(NebulaSh);
+import { NebulaShAddon, Computer } from "nebula-sh";
 
 // Create a new terminal
 const terminal = new Terminal();
@@ -21,7 +16,7 @@ const addon = new NebulaShAddon();
 terminal.loadAddon(addon);
 
 // Debug
-Object.assign(window, { terminal, addon });
+Object.assign(window, { terminal, addon, Computer });
 
 // Attach the terminal to the DOM
 terminal.open(document.getElementById("root") ?? document.body);
