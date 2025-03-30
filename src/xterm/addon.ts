@@ -10,6 +10,9 @@ import { defaultComputer } from "../computer/computer";
 
 import { modifyLogXterm } from "../terminal/utils/log";
 
+/**
+ * A set of control characters.
+ */
 enum ControlCharacters {
     Backspace = "\x7f",
     UpArrow = "\x1b[A",
@@ -18,6 +21,38 @@ enum ControlCharacters {
     RightArrow = "\x1b[C",
     NewLine = "\r",
 }
+
+/**
+ * The cursor mode.
+ * - {@link CursorMode.Insert} - The cursor is in insert mode. Characters are inserted at the cursor position.
+ * - {@link CursorMode.Override} - The cursor is in override mode. Characters replace the character at the cursor position.
+ */
+export enum CursorMode {
+    Insert = "insert",
+    Override = "override",
+}
+
+/**
+ * A set of options for the nebula-sh addon.
+ */
+export interface NebulaShAddonOptions {
+    /**
+     * Whether to display the prompt upon activation.
+     * @default true
+     */
+    shouldDisplayPromptUponActivation?: boolean;
+
+    /**
+     * The cursor mode. See {@link CursorMode}.
+     * @default CursorMode.Override
+     */
+    cursorMode?: CursorMode;
+}
+
+const defaultNebulaShAddonOptions: Required<NebulaShAddonOptions> = {
+    shouldDisplayPromptUponActivation: true,
+    cursorMode: CursorMode.Override,
+};
 
 /**
  * The xterm addon for nebula-sh.
@@ -36,14 +71,33 @@ export class NebulaShAddon implements ITerminalAddon {
      * @param data - The data received from the terminal. Should be {@link ControlCharacters.Backspace}.
      */
     private handleBackspace(terminal: Terminal, data: string): void {
-        // If the current line is empty, return (prevents user from deleting the prompt).
-        if (this.currentLine === "") {
+        // Remove the last character from the current line.
+        // this.currentLine = this.currentLine.slice(0, -1);
+        // terminal.write("\b \b");
+
+        // Get the cursor position relative to the actual current line (excludes prompt).
+        const cursorPositionCached = terminal.buffer.active.cursorX;
+
+        const actualCursorPosition = terminal.buffer.active.cursorX - this.computer.consoleHost.getRawPrompt().length - 1;
+
+        // If the cursor is at the start of the line, return.
+        if (actualCursorPosition < 0) {
             return;
         }
 
-        // Remove the last character from the current line.
-        this.currentLine = this.currentLine.slice(0, -1);
-        terminal.write("\b \b");
+        // Remove the character at the cursor position.
+        this.currentLine =
+            // Data before the cursor
+            this.currentLine.slice(0, actualCursorPosition) +
+            // Data after the cursor
+            this.currentLine.slice(actualCursorPosition + 1);
+
+        // Write the data to the terminal.
+        // TODO: Find a better way to handle backspace.
+        this.rerenderCurrentLine(terminal);
+
+        // Move the cursor back to the correct position.
+        terminal.write("\x1b[" + cursorPositionCached + "G");
     }
 
     /**
@@ -143,11 +197,18 @@ export class NebulaShAddon implements ITerminalAddon {
     }
 
     /**
-     * Adds data to the current line in override mode.
+     * Writes the data to the terminal and adds it to the current line in override mode.
      * @param data - The data to add.
      * @param terminal - The terminal.
      */
     private addDataToCurrentLineOverrideMode(data: string, terminal: Terminal): void {
+        terminal.write(data);
+
+        // If the data is a control character, don't add it to the current line.
+        if (data.charCodeAt(0) < 32) {
+            return;
+        }
+
         /**
          * The cursor position relative to actual current line (excludes prompt).
          */
@@ -193,16 +254,17 @@ export class NebulaShAddon implements ITerminalAddon {
             }
             // TODO: Add support for ctrl+backspace, ctrl+left, ctrl+right, etc.
 
-            // Character is generic, write the data to the terminal.
-            // TODO: This is override mode, add support for insert mode.
-            terminal.write(data);
+            // Write the data to the terminal.
+            switch (addon.options.cursorMode) {
+                case CursorMode.Insert:
+                    // TODO: Implement insert mode
+                    break;
 
-            // If the data is a control character, don't add it to the current line.
-            if (data.charCodeAt(0) < 32) {
-                return;
+                case CursorMode.Override:
+                default:
+                    addon.addDataToCurrentLineOverrideMode(data, terminal);
+                    break;
             }
-
-            addon.addDataToCurrentLineOverrideMode(data, terminal);
         }),
     ];
 
@@ -237,11 +299,20 @@ export class NebulaShAddon implements ITerminalAddon {
     private cachedCurrentLine = "";
 
     /**
-     * Creates a new instance of the addon.
-     * @param computer - The computer. See {@link Computer}
+     * The options. See {@link NebulaShAddonOptions}.
      */
-    public constructor(computer: Computer = defaultComputer) {
+    public options: Required<NebulaShAddonOptions>;
+
+    /**
+     * Creates a new instance of the addon.
+     * @param computer - The computer. See {@link Computer}.
+     * @param options - The options. See {@link NebulaShAddonOptions}.
+     */
+    public constructor(computer: Computer = defaultComputer, options: NebulaShAddonOptions = {}) {
         this.computer = computer;
+
+        // Merge the options with the default options.
+        this.options = { ...defaultNebulaShAddonOptions, ...options };
     }
 
     /**
@@ -283,5 +354,13 @@ export class NebulaShAddon implements ITerminalAddon {
         }
 
         terminal.write(prompt);
+    }
+
+    /**
+     * Rerenders the current line in the terminal.
+     * @param terminal - The terminal.
+     */
+    public rerenderCurrentLine(terminal: Terminal): void {
+        terminal.write("\r\x1b[K" + this.computer.consoleHost.getPrompt() + this.currentLine);
     }
 }
