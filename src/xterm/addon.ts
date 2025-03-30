@@ -10,6 +10,15 @@ import { defaultComputer } from "../computer/computer";
 
 import { modifyLogXterm } from "../terminal/utils/log";
 
+enum ControlCharacters {
+    Backspace = "\x7f",
+    UpArrow = "\x1b[A",
+    DownArrow = "\x1b[B",
+    LeftArrow = "\x1b[D",
+    RightArrow = "\x1b[C",
+    NewLine = "\r",
+}
+
 /**
  * The xterm addon for nebula-sh.
  * @example
@@ -22,6 +31,118 @@ terminal.loadAddon(addon);
  */
 export class NebulaShAddon implements ITerminalAddon {
     /**
+     * Handles the backspace key by removing the last character from the current line.
+     * @param terminal - The terminal.
+     * @param data - The data received from the terminal. Should be {@link ControlCharacters.Backspace}.
+     */
+    private handleBackspace(terminal: Terminal, data: string): void {
+        // If the current line is empty, return (prevents user from deleting the prompt).
+        if (this.currentLine === "") {
+            return;
+        }
+
+        // Remove the last character from the current line.
+        this.currentLine = this.currentLine.slice(0, -1);
+        terminal.write("\b \b");
+    }
+
+    /**
+     * Handles the up and down arrow keys by moving through the command history.
+     * @param terminal - The terminal.
+     * @param data - The data received from the terminal. Should be {@link ControlCharacters.UpArrow} or {@link ControlCharacters.DownArrow}.
+     */
+    private handleHistory(terminal: Terminal, data: string): void {
+        // If the history is empty, return.
+        if (this.computer.consoleHost.history.length === 0) {
+            return;
+        }
+
+        const oldHistoryPosition = this.historyPosition;
+
+        // Check if data is an up or down arrow and move the history position accordingly.
+        if (data === ControlCharacters.UpArrow) {
+            // Up arrow
+            this.historyPosition++;
+        } else if (data === ControlCharacters.DownArrow) {
+            // Down arrow
+            this.historyPosition--;
+        }
+
+        // Clamp the history position to the bounds of the history array.
+        this.historyPosition = Math.max(0, Math.min(this.historyPosition, this.computer.consoleHost.history.length));
+
+        // If the history position did not change, return.
+        if (this.historyPosition == oldHistoryPosition) {
+            return;
+        }
+
+        // If the history position changed from 0 to 1, cache the current line.
+        if (oldHistoryPosition === 0 && this.historyPosition === 1) {
+            this.cachedCurrentLine = this.currentLine;
+        }
+
+        // Get the command from the history.
+        const command =
+            this.historyPosition === 0
+                ? this.cachedCurrentLine
+                : this.computer.consoleHost.history[this.computer.consoleHost.history.length - this.historyPosition];
+
+        // Clear the current line and write the command.
+        terminal.write("\r\x1b[K" + this.computer.consoleHost.getPrompt() + command);
+
+        // Set the current line to the command.
+        this.currentLine = command;
+        return;
+    }
+
+    // If the data is a left or right arrow, move the cursor but stop it from moving past the prompt (left) or the end of the line (right).
+    private handleLeftOrRightArrow(terminal: Terminal, data: string): void {
+        /**
+         * The length of the prompt.
+         */
+        const promptLength = this.computer.consoleHost.getRawPrompt().length;
+
+        if (data === ControlCharacters.RightArrow) {
+            // Check if the cursor is at the end of the line by adding the prompt length to the current line length.
+            if (terminal.buffer.active.cursorX >= promptLength + this.currentLine.length) {
+                return;
+            }
+
+            terminal.write(data);
+            return;
+        }
+
+        if (data === ControlCharacters.LeftArrow) {
+            // Check if the cursor is at the start of the line.
+            if (terminal.buffer.active.cursorX <= promptLength) {
+                return;
+            }
+
+            terminal.write(data);
+            return;
+        }
+    }
+
+    private handleNewline(terminal: Terminal, data: string): void {
+        // Move the cursor to the next line.
+        terminal.write("\r\n");
+
+        // Handle the command.
+        this.computer.consoleHost.runCommand(this.currentLine);
+
+        // Clear the current line.
+        this.currentLine = "";
+
+        // Display the prompt.
+        this.displayPrompt(terminal);
+
+        // Reset the history position.
+        this.historyPosition = 0;
+
+        return;
+    }
+
+    /**
      * A function that generates event listeners for the terminal.
      * @param terminal - The terminal.
      * @param addon - The addon.
@@ -32,118 +153,28 @@ export class NebulaShAddon implements ITerminalAddon {
         terminal.onData((data) => {
             // console.log(data.charCodeAt(0));
 
-            // If the data is a backspace character, remove the last character from the current line.
-            if (data === "\x7f") {
-                // If the current line is empty, return (prevents user from deleting the prompt).
-                if (addon.currentLine === "") {
+            switch (data) {
+                case ControlCharacters.Backspace:
+                    addon.handleBackspace(terminal, data);
                     return;
-                }
-
-                // Remove the last character from the current line.
-                addon.currentLine = addon.currentLine.slice(0, -1);
-                terminal.write("\b \b");
-                return;
+                case ControlCharacters.UpArrow:
+                case ControlCharacters.DownArrow:
+                    addon.handleHistory(terminal, data);
+                    return;
+                case ControlCharacters.LeftArrow:
+                case ControlCharacters.RightArrow:
+                    addon.handleLeftOrRightArrow(terminal, data);
+                    return;
+                case ControlCharacters.NewLine:
+                    addon.handleNewline(terminal, data);
+                    return;
             }
-
-            // If the data is an up arrow or down arrow, navigate the history.
-            if (data === "\x1b[A" || data === "\x1b[B") {
-                // If the history is empty, return.
-                if (addon.computer.consoleHost.history.length === 0) {
-                    return;
-                }
-
-                const oldHistoryPosition = addon.historyPosition;
-
-                // Check if data is an up or down arrow and move the history position accordingly.
-                if (data === "\x1b[A") {
-                    // Up arrow
-                    addon.historyPosition++;
-                } else if (data === "\x1b[B") {
-                    // Down arrow
-                    addon.historyPosition--;
-                }
-
-                // Clamp the history position to the bounds of the history array.
-                addon.historyPosition = Math.max(
-                    0,
-                    Math.min(addon.historyPosition, addon.computer.consoleHost.history.length),
-                );
-
-                // If the history position did not change, return.
-                if (addon.historyPosition == oldHistoryPosition) {
-                    return;
-                }
-
-                // Get the command from the history.
-                const command =
-                    addon.historyPosition === 0
-                        ? ""
-                        : addon.computer.consoleHost.history[
-                              addon.computer.consoleHost.history.length - addon.historyPosition
-                          ];
-
-                // Clear the current line and write the command.
-                terminal.write("\r\x1b[K" + addon.computer.consoleHost.getPrompt() + command);
-
-                // Set the current line to the command.
-                addon.currentLine = command;
-
-                return;
-            }
-
-            // If the data is a left or right arrow, move the cursor but stop it from moving past the prompt (left) or the end of the line (right).
-
-            /**
-             * The length of the prompt.
-             */
-            const promptLength = addon.computer.consoleHost.getRawPrompt().length;
-
-            if (data === "\x1b[C") {
-                // Check if the cursor is at the end of the line by adding the prompt length to the current line length.
-                if (terminal.buffer.active.cursorX >= promptLength + addon.currentLine.length) {
-                    return;
-                }
-
-                terminal.write(data);
-                return;
-            }
-
-            if (data === "\x1b[D") {
-                // Check if the cursor is at the start of the line.
-                if (terminal.buffer.active.cursorX <= promptLength) {
-                    return;
-                }
-
-                terminal.write(data);
-                return;
-            }
-
             // TODO: Add support for ctrl+backspace, ctrl+left, ctrl+right, etc.
 
-            // Write the data to the terminal.
+            // Character is generic, write the data to the terminal.
             terminal.write(data);
 
-            // If the data is a newline character, handle the command.
-            if (data === "\r") {
-                // Move the cursor to the next line.
-                terminal.write("\n");
-
-                // Handle the command.
-                addon.computer.consoleHost.runCommand(addon.currentLine);
-
-                // Clear the current line.
-                addon.currentLine = "";
-
-                // Display the prompt.
-                addon.displayPrompt(terminal);
-
-                // Reset the history position.
-                addon.historyPosition = 0;
-
-                return;
-            }
-
-            // If the data is a control character, ignore it.
+            // If the data is a control character, don't add it to the current line.
             if (data.charCodeAt(0) < 32) {
                 return;
             }
@@ -151,9 +182,6 @@ export class NebulaShAddon implements ITerminalAddon {
             // Add the data to the current line (if it's not a newline character).
             addon.currentLine += data;
         }),
-        // terminal.onCursorMove((row, col) => {
-        //     console.log("Cursor move", row, col);
-        // }),
     ];
 
     /**
@@ -180,6 +208,11 @@ export class NebulaShAddon implements ITerminalAddon {
      * @example "ls -a"
      */
     private currentLine = "";
+
+    /**
+     * The cached current line to restore when the user presses the down arrow.
+     */
+    private cachedCurrentLine = "";
 
     /**
      * Creates a new instance of the addon.
