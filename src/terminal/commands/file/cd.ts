@@ -1,7 +1,7 @@
 /**
  * @file Declares the cd and pwd commands.
  */
-import { Command } from "../../command";
+import { Command, CommandArgument } from "../../command";
 
 import { log, LogLevel } from "../../utils/log";
 import { Filesystem } from "../../../filesystem/filesystem";
@@ -18,7 +18,7 @@ export const cdCommand = new Command({
             type: "string",
             defaultValue: ".",
             required: true,
-        },
+        } as CommandArgument<"string">,
     ],
 
     flags: [],
@@ -28,6 +28,15 @@ export const cdCommand = new Command({
         const { args } = options;
 
         const path = args[0];
+
+        // Special case for changing to the root directory
+        if (path === "/") {
+            // Set the current working directory
+            options.consoleHost.currentWorkingDirectory = options.consoleHost.computer.filesystem.root;
+
+            // log("Changed to root directory", LogLevel.Log);
+            return;
+        }
 
         // Get the directory
         const directory = options.currentWorkingDirectory.getDirectory(path);

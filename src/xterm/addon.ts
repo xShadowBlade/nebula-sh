@@ -6,7 +6,7 @@ import type { Terminal, IDisposable, ITerminalAddon } from "@xterm/xterm";
 import type { Computer } from "../computer/computer";
 import { defaultComputer } from "../computer/computer";
 
-import { modifyLog } from "../terminal/utils/log";
+import { modifyLogXterm } from "../terminal/utils/log";
 
 // Example
 // class DataLoggerAddon {
@@ -152,7 +152,7 @@ export class NebulaShAddon implements ITerminalAddon {
         // this.disposables.push(terminal.onData((d) => console.log(d)));
 
         // Modify the log utility.
-        modifyLog(terminal);
+        modifyLogXterm(this.computer.consoleHost, terminal);
 
         // Add the event listeners.
         this.disposables.push(...NebulaShAddon.generateEventListeners(terminal, this));

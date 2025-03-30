@@ -15,6 +15,7 @@ import { suCommand } from "../terminal/commands/user/su";
 import { clearCommand, historyCommand } from "../terminal/commands/history";
 import { exitCommand } from "../terminal/commands/exit";
 import { rmCommand } from "../terminal/commands/file/rm";
+import { displayMessagesCommand } from "../terminal/commands/debug/displayMessages";
 
 /**
  * The computer class.
@@ -40,6 +41,15 @@ export class Computer {
         computer: this,
         commandDriver: this.commandDriver,
     });
+
+    /**
+     * Resets the computer by resetting the filesystem and console host.
+     * See {@link Filesystem.reset} and {@link ConsoleHost.reset}.
+     */
+    public reset(): void {
+        this.filesystem.reset();
+        this.consoleHost.reset();
+    }
 }
 
 /**
@@ -63,6 +73,7 @@ const defaultComputer = new Computer();
     exitCommand,
     rmCommand,
     helpCommand,
+    displayMessagesCommand,
 ].forEach((command) => {
     defaultComputer.commandDriver.addCommand(command);
 });

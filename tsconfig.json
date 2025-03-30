@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"allowJs": true,
 		"target": "ES5",
-		"module": "NodeNext",
+		"module": "Preserve",
 		"strict": true,
 		"lib": ["ESNext", "dom"],
 		"esModuleInterop": true,
@@ -10,7 +10,7 @@
 		"declaration": true,
 		"emitDeclarationOnly": true,
 		"forceConsistentCasingInFileNames": true,
-		"moduleResolution": "NodeNext",
+		"moduleResolution": "bundler",
 		"baseUrl": "./src",  // Adjust this based on your project structure
 		"outDir": "./dist/types",  // Adjust this based on your project structure
 		"sourceMap": true

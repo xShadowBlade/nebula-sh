@@ -22,10 +22,11 @@
     }
   },
   "main": "./test/run.mjs",
+  "type": "module",
   "scripts": {
     "build": "esbuild ./src/index.ts ./src/indexNode.ts --bundle --minify --platform=node --sourcemap --outdir=./dist/ --format=esm",
-    "dev": "esbuild ./src/index.ts ./src/indexNode.ts --bundle --platform=node --sourcemap --outdir=./dist/ --watch --format=esm",
     "build:types": "tsc --declaration --emitDeclarationOnly --outDir ./dist/types",
+    "dev": "esbuild ./src/index.ts ./src/indexNode.ts --bundle --platform=node --sourcemap --outdir=./dist/ --watch --format=esm",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint --fix src/**/*.ts"
   },
