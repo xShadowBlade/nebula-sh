@@ -126,6 +126,17 @@ export class ConsoleHost {
     }
 
     /**
+     * Gets the raw prompt for the console, without ANSI escape codes.
+     * @returns The raw prompt.
+     * @example "nebula-sh root:/home$ "
+     */
+    public getRawPrompt(): string {
+        // return `nebula-sh ${this.currentUser.name}:${this.currentWorkingDirectory.path || "/"}$ `;
+        // eslint-disable-next-line no-control-regex
+        return this.getPrompt().replace(/\u001b\[\d+m/gi, "");
+    }
+
+    /**
      * Runs a command.
      * @param command - The command to run.
      * @param options - The command options.
