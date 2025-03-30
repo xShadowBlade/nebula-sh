@@ -1,8 +1,10 @@
+#!/usr/bin/env node
+
 /**
  * @file This file imports the node package and runs it
  */
-import { run } from "../dist/indexNode.js";
+import { run } from "./indexNode";
 
-(async () => {
+(async (): Promise<void> => {
     await run();
 })();

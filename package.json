@@ -21,12 +21,14 @@
       "default": "./dist/indexNode.js"
     }
   },
-  "main": "./test/run.mjs",
+  "bin": {
+    "nebula-sh": "dist/runNode.js"
+  },
   "type": "module",
   "scripts": {
-    "build": "esbuild ./src/index.ts ./src/indexNode.ts --bundle --minify --platform=node --sourcemap --outdir=./dist/ --format=esm",
+    "build": "esbuild ./src/index.ts ./src/indexNode.ts ./src/runNode.ts --bundle --minify --platform=node --sourcemap --outdir=./dist/ --format=esm",
     "build:types": "tsc --declaration --emitDeclarationOnly --outDir ./dist/types",
-    "dev": "esbuild ./src/index.ts ./src/indexNode.ts --bundle --platform=node --sourcemap --outdir=./dist/ --watch --format=esm",
+    "dev": "esbuild ./src/index.ts --bundle --platform=node --sourcemap --outdir=./dist/ --watch --format=esm",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint --fix src/**/*.ts"
   },

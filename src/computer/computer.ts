@@ -80,35 +80,3 @@ const defaultComputer = new Computer();
 
 // Export after adding the built-in commands
 export { defaultComputer };
-
-// Run some commands
-// TODO: Move these tests to an actual test file
-// computer.consoleHost.runCommand("help -a");
-// [
-//     "whoami",
-//     "useradd test",
-//     "listusers",
-//     "su test",
-//     "mkdir folder",
-//     "cd ./folder",
-//     "pwd",
-//     "touch file.txt",
-//     "mkdir subfolder",
-//     "cd ./subfolder",
-//     "pwd",
-//     "touch file2.txt",
-//     "cd ../..",
-//     "pwd",
-
-//     "ls -r",
-//     // "cd /folder",
-//     "rm -r ./folder/subfolder",
-//     "ls -r",
-
-//     // "history",
-//     // "clear",
-
-//     "",
-// ].forEach((command) => {
-//     defaultComputer.consoleHost.runCommand(command);
-// });
