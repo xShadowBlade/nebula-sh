@@ -36,7 +36,6 @@ export const clearCommand = new Command({
 
     // The function to run when the command is called
     onCommand: (options): void => {
-        // options.consoleHost.clear();
         console.clear();
     },
 });

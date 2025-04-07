@@ -131,7 +131,6 @@ export class ConsoleHost {
      * @example "nebula-sh root:/home$ "
      */
     public getRawPrompt(): string {
-        // return `nebula-sh ${this.currentUser.name}:${this.currentWorkingDirectory.path || "/"}$ `;
         // eslint-disable-next-line no-control-regex
         return this.getPrompt().replace(/\u001b\[\d+m/gi, "");
     }
@@ -147,12 +146,7 @@ export class ConsoleHost {
         options?: Parameters<CommandDriver["runCommandString"]>[2],
         logPrompt = true,
     ): void {
-        // TODO: Switch to xterm.js
-        // log(this.currentWorkingDirectory.path || "/", LogLevel.Shell, command);
         if (logPrompt) console.log(this.getPrompt() + command);
-
-        // Debug: log command
-        // log(command, LogLevel.Debug);
 
         // If the command is empty, return
         if (command === "") return;

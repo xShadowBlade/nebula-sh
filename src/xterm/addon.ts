@@ -9,6 +9,8 @@ import type { Computer } from "../computer/computer";
 import { defaultComputer } from "../computer/computer";
 
 import { modifyLogXterm } from "../terminal/utils/log";
+import { clearCommand } from "../terminal/commands/history";
+import { xtermClearCommandFactory } from "./addonCommands";
 
 /**
  * A set of control characters.
@@ -322,6 +324,10 @@ export class NebulaShAddon implements ITerminalAddon {
     public activate(terminal: Terminal): void {
         // Modify the log utility.
         modifyLogXterm(this.computer.consoleHost, terminal);
+
+        // Add commands
+        this.computer.commandDriver.removeCommand(clearCommand.name);
+        this.computer.commandDriver.addCommand(xtermClearCommandFactory(terminal));
 
         // Add the event listeners.
         this.disposables.push(...NebulaShAddon.generateEventListeners(terminal, this));

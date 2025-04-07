@@ -1,6 +1,7 @@
 /**
  * @file Declares commands specific to the xterm addon.
  */
+import { Terminal } from "@xterm/xterm";
 import type { CommandArgument, CommandFlag } from "../terminal/command";
 import { Command } from "../terminal/command";
 import { log, LogLevel } from "../terminal/utils/log";
@@ -59,3 +60,21 @@ export const settingsCommand = new Command({
         // }
     },
 });
+
+export const xtermClearCommandFactory = (terminal: Terminal): Command => {
+    return new Command({
+        name: "clear",
+        description: "Clear the console",
+
+        // The arguments for the command
+        arguments: [],
+
+        // The flags for the command
+        flags: [],
+
+        // The function to run when the command is called
+        onCommand: (): void => {
+            terminal.clear();
+        },
+    });
+};

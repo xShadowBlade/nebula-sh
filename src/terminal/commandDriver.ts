@@ -99,6 +99,20 @@ export class CommandDriver {
     }
 
     /**
+     * Removes a command by name.
+     * @param name - The command name.
+     */
+    public removeCommand(name: string): void {
+        const command = this.getCommand(name);
+
+        if (!command) {
+            return;
+        }
+
+        this.commands.splice(this.commands.indexOf(command), 1);
+    }
+
+    /**
      * Runs a command.
      * @param nameOrCommand - The command name or command.
      * @param consoleHost - The console host. See {@link ConsoleHost}.
