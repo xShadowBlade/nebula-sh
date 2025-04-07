@@ -1,22 +1,37 @@
 /**
  * @file Declares the history and clear commands.
  */
+import type { CommandArgument, CommandFlag } from "../command";
 import { Command } from "../command";
 import { log, LogLevel } from "../utils/log";
 
 export const historyCommand = new Command({
     name: "history",
-    description: "A template command (wow this has so much boilerplate)",
+    description: "Show the command history",
 
     // The arguments for the command
     arguments: [],
 
     // The flags for the command
-    flags: [],
+    flags: [
+        {
+            name: ["clear", "c", "C"],
+            description: "Whether to clear the history without showing it",
+            type: "boolean",
+            defaultValue: false,
+        } as CommandFlag<"clear", "boolean">,
+    ],
 
     // The function to run when the command is called
     onCommand: (options): void => {
-        const { consoleHost } = options;
+        const { consoleHost, flags } = options;
+
+        // If the clear flag is set, clear the history
+        if (flags.clear) {
+            consoleHost.clearHistory();
+            log("History cleared", LogLevel.Log);
+            return;
+        }
 
         consoleHost.history.forEach((command, index) => {
             log(`${index + 1} ${command}`, LogLevel.Log);
